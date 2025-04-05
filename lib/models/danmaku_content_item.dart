@@ -138,18 +138,15 @@ class SpecialDanmakuContentItem extends DanmakuContentItem {
             ? value /= videoSize
             : value;
 
-    double? start;
-    double? end;
-    if (rawStart is num) {
-      start = rawStart.toDouble();
-      end = rawStart.toDouble();
-    } else if (rawStart is String) {
-      start = double.tryParse(rawStart);
-      end = double.tryParse(rawEnd);
-      if (start == null && end == null) return (0, 0);
-      start ??= end;
-      end ??= start;
-    }
+    if (rawStart is num) rawStart = rawStart.toString();
+    if (rawEnd is num) rawEnd = rawEnd.toString();
+
+    double? start = double.tryParse(rawStart);
+    double? end = double.tryParse(rawEnd);
+    if (start == null && end == null) return (0, 0);
+    start ??= end;
+    end ??= start;
+
     return (toRadix(start, rawStart), toRadix(end, rawEnd));
   }
 
