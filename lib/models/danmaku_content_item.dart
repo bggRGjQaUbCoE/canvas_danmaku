@@ -138,11 +138,18 @@ class SpecialDanmakuContentItem extends DanmakuContentItem {
             ? value /= videoSize
             : value;
 
-    if (rawStart is num) rawStart = rawStart.toString();
-    if (rawEnd is num) rawEnd = rawEnd.toString();
+    double? convert(value) {
+      if (value is num) {
+        return value.toDouble();
+      } else if (value is String) {
+        return double.tryParse(value);
+      }
+      return null;
+    }
 
-    double? start = double.tryParse(rawStart);
-    double? end = double.tryParse(rawEnd);
+    double? start = convert(rawStart);
+    double? end = convert(rawEnd);
+
     if (start == null && end == null) return (0, 0);
     start ??= end;
     end ??= start;
@@ -153,14 +160,14 @@ class SpecialDanmakuContentItem extends DanmakuContentItem {
   static int _parseInt(dynamic digit) => switch (digit) {
         int() => digit,
         double() => digit.toInt(),
-        String() => int.parse(digit),
+        String() => int.tryParse(digit) ?? 0,
         _ => throw UnimplementedError()
       };
 
   static double _parseDouble(dynamic digit) => switch (digit) {
         int() => digit.toDouble(),
         double() => digit,
-        String() => double.parse(digit),
+        String() => double.tryParse(digit) ?? 0,
         _ => throw UnimplementedError()
       };
 
