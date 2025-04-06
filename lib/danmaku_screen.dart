@@ -156,6 +156,25 @@ class _DanmakuScreenState extends State<DanmakuScreen>
 
     if (content.type == DanmakuItemType.special) {
       if (!_option.hideSpecial) {
+        (content as SpecialDanmakuContentItem).painterCache = TextPainter(
+          text: TextSpan(
+            text: content.text,
+            style: TextStyle(
+              color: content.color,
+              fontSize: content.fontSize,
+              fontWeight: FontWeight.values[_option.fontWeight],
+              shadows: content.hasStroke
+                  ? [
+                      Shadow(
+                          color: Colors.black.withOpacity(
+                              content.alphaTween?.begin ?? content.color.a),
+                          blurRadius: _option.strokeWidth)
+                    ]
+                  : null,
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        )..layout();
         _specialDanmakuItems.add(DanmakuItem(
           width: 0,
           height: 0,
