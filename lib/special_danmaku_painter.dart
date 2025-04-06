@@ -50,8 +50,8 @@ class SpecialDanmakuPainter extends CustomPainter {
   void _paintSpecialDanmaku(
       Canvas canvas, SpecialDanmakuContentItem item, Size size, int elapsed) {
     // 透明度动画
-    late final alpha =
-        item.alphaTween?.transform(elapsed / item.duration) ?? item.color.a;
+    late final alpha = item.alphaTween?.transform(elapsed / item.duration) ??
+        item.color.opacity;
     final color =
         item.alphaTween == null ? item.color : item.color.withOpacity(alpha);
     // 文本

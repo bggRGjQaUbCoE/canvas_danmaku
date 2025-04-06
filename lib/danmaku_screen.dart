@@ -167,7 +167,8 @@ class _DanmakuScreenState extends State<DanmakuScreen>
                   ? [
                       Shadow(
                           color: Colors.black.withOpacity(
-                              content.alphaTween?.begin ?? content.color.a),
+                              content.alphaTween?.begin ??
+                                  content.color.opacity),
                           blurRadius: _option.strokeWidth)
                     ]
                   : null,
