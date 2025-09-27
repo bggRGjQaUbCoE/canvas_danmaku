@@ -62,7 +62,7 @@ class _DanmakuScreenState extends State<DanmakuScreen>
   late final _random = Random();
 
   late final Ticker _ticker;
-  late final ValueNotifierExt<int> _notifier;
+  late final ValueNotifier<int> _notifier;
   late int _lastTick = 0;
   Timer? _timer;
 
@@ -87,7 +87,7 @@ class _DanmakuScreenState extends State<DanmakuScreen>
     _danmakuHeight = _textPainter.height;
 
     _ticker = createTicker(_tick);
-    _notifier = ValueNotifierExt(0);
+    _notifier = ValueNotifier(0);
   }
 
   void _tick(Duration elapsed) {
@@ -255,36 +255,20 @@ class _DanmakuScreenState extends State<DanmakuScreen>
         break;
       case DanmakuItemType.special:
         if (_option.hideSpecial) return;
-        (content as SpecialDanmakuContentItem).painterCache = TextPainter(
-          text: TextSpan(
-            text: content.text,
-            style: TextStyle(
-              color: content.color,
-              fontSize: content.fontSize,
-              fontWeight: FontWeight.values[_option.fontWeight],
-              shadows: content.hasStroke
-                  ? [
-                      Shadow(
-                          color: Colors.black.withValues(
-                              alpha:
-                                  content.alphaTween?.begin ?? content.color.a),
-                          blurRadius: _option.strokeWidth)
-                    ]
-                  : null,
-            ),
-          ),
-          textDirection: TextDirection.ltr,
-        )..layout();
         _specialDanmakuItems.add(
           DanmakuItem(
             width: 0,
             height: 0,
             content: content,
-            paragraph: null,
+            paragraph: DmUtils.generateSpecialParagraph(
+                content: content as SpecialDanmakuContentItem,
+                fontWeight: _option.fontWeight,
+                elapsed: 0,
+                strokeWidth: _option.strokeWidth),
             strokeParagraph: null,
           ),
         );
-        if (_running) {
+        if (!_ticker.muted) {
           if (!_ticker.isActive) {
             _ticker.start();
           }
@@ -489,9 +473,8 @@ class _DanmakuScreenState extends State<DanmakuScreen>
       // 移除高级弹幕
       _specialDanmakuItems.removeWhere((item) {
         if (item.content case SpecialDanmakuContentItem e) {
-          return e.needRemove(
-            item.drawTick != null && (tick - item.drawTick!) >= e.duration,
-          );
+          return item.needRemove(
+              item.drawTick != null && (tick - item.drawTick!) >= e.duration);
         }
         return true;
       });
@@ -606,7 +589,7 @@ class _DanmakuScreenState extends State<DanmakuScreen>
   }
 }
 
-class ListValueNotifier<T> extends ValueNotifierExt<List<T>> {
+class ListValueNotifier<T> extends ValueNotifier<List<T>> {
   ListValueNotifier(super.value);
 
   void add(T item) {
@@ -636,10 +619,9 @@ class ListValueNotifier<T> extends ValueNotifierExt<List<T>> {
   }
 }
 
-class ValueNotifierExt<T> extends ValueNotifier<T> {
-  ValueNotifierExt(super.value);
-
+extension ValueNotifierExt<T> on ValueNotifier<T> {
   void refresh() {
+    // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
     notifyListeners();
   }
 }

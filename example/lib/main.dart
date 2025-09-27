@@ -156,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                         translateXTween: Tween<double>(begin: 0.5, end: 0.5),
                         translateYTween: Tween<double>(begin: 0.5, end: 0.5),
                         alphaTween: Tween<double>(begin: 1, end: 0),
-                        matrix: Matrix4.identity()..rotateZ(i * pi / 18),
+                        rotateZ: i * pi / 18,
                         easingType: Curves.linear,
                         hasStroke: true,
                       ),
@@ -629,9 +629,8 @@ class _HomePageState extends State<HomePage> {
         begin: _random.nextDouble(),
         end: _random.nextDouble(),
       ),
-      matrix: Matrix4.identity()
-        ..rotateZ(_random.nextDouble() * pi)
-        ..rotateY(_random.nextDouble() * pi),
+      rotateZ: _random.nextDouble() * pi,
+      // matrix: Matrix4.identity()..rotateY(_random.nextDouble() * pi),
       duration: duration,
       translationDuration: translationDuration,
       translationStartDelay: translationStartDelay,
