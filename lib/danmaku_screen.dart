@@ -600,7 +600,7 @@ class _DanmakuScreenState extends State<DanmakuScreen>
       List<DanmakuItem> danmakuItems, Offset position) sync* {
     if (danmakuItems.isNotEmpty) {
       final dy = position.dy;
-      for (var i in danmakuItems) {
+      for (var i in danmakuItems.reversed) {
         final double danmakuY0;
         final double danmakuY1;
         if (i.content.type == DanmakuItemType.bottom) {
@@ -626,7 +626,7 @@ class _DanmakuScreenState extends State<DanmakuScreen>
       List<DanmakuItem> danmakuItems, Offset position) {
     if (danmakuItems.isNotEmpty) {
       final dy = position.dy;
-      for (var i in danmakuItems) {
+      for (var i in danmakuItems.reversed) {
         final double danmakuY0;
         final double danmakuY1;
         if (i.content.type == DanmakuItemType.bottom) {
