@@ -69,4 +69,9 @@ class DanmakuItem {
       height = paragraph.height;
     }
   }
+
+  @override
+  String toString() {
+    return 'DanmakuItem(content=$content, xPos=$xPosition, yPos=$yPosition, size=${ui.Size(width, height)}, drawTick=$drawTick)';
+  }
 }

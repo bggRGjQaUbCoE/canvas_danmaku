@@ -31,6 +31,11 @@ class DanmakuContentItem {
     this.isColorful = false,
     this.count,
   });
+
+  @override
+  String toString() {
+    return 'DanmakuContentItem(text="$text", color=0x${color.toARGB32().toRadixString(16)}, type=${type.name}${count != null ? ", count=$count" : ""}${selfSend ? ", selfSend" : ""}${isColorful ? ", colorful" : ""})';
+  }
 }
 
 class SpecialDanmakuContentItem extends DanmakuContentItem {

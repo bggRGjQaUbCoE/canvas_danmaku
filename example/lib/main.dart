@@ -279,7 +279,12 @@ class _HomePageState extends State<HomePage> {
                 child: DanmakuScreen(
                   key: _danmuKey,
                   createdController: (DanmakuController e) {
-                    _controller = e;
+                    _controller = e
+                      ..updateOption(
+                        e.option.copyWith(
+                          onTapAll: (v) => debugPrint(v.toString()),
+                        ),
+                      );
                   },
                   option: DanmakuOption(
                     fontSize: _fontSize,

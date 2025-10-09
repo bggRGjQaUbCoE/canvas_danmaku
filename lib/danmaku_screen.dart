@@ -34,11 +34,8 @@ class _DanmakuScreenState extends State<DanmakuScreen>
   double _viewWidth = 0;
   double _viewHeight = 0;
 
-  /// 弹幕控制器
-  late DanmakuController _controller;
-
   /// 弹幕配置
-  DanmakuOption _option = DanmakuOption();
+  DanmakuOption _option = const DanmakuOption();
 
   /// 滚动弹幕
   final List<DanmakuItem> _scrollDanmakuItems = <DanmakuItem>[];
@@ -73,7 +70,13 @@ class _DanmakuScreenState extends State<DanmakuScreen>
   void initState() {
     super.initState();
     _option = widget.option;
-    _controller = DanmakuController(
+
+    _danmakuHeight = _textPainter.height;
+
+    _ticker = createTicker(_tick);
+    _notifier = ValueNotifier(0);
+
+    widget.createdController(DanmakuController(
       addDanmaku: _addDanmaku,
       updateOption: _updateOption,
       pause: _pause,
@@ -81,13 +84,7 @@ class _DanmakuScreenState extends State<DanmakuScreen>
       clear: _clear,
       getOption: () => _option,
       isRunning: () => _running,
-    );
-    widget.createdController(_controller);
-
-    _danmakuHeight = _textPainter.height;
-
-    _ticker = createTicker(_tick);
-    _notifier = ValueNotifier(0);
+    ));
   }
 
   void _tick(Duration elapsed) {
@@ -499,8 +496,9 @@ class _DanmakuScreenState extends State<DanmakuScreen>
       _trackCount = _trackCount - 1;
     }
 
-    _trackYPositions =
-        List<double>.generate(_trackCount, (i) => i * _danmakuHeight);
+    _trackYPositions = List<double>.generate(
+        _trackCount, (i) => i * _danmakuHeight,
+        growable: false);
   }
 
   @override
@@ -516,11 +514,13 @@ class _DanmakuScreenState extends State<DanmakuScreen>
         }
 
         return ClipRect(
-          child: IgnorePointer(
+          child: Listener(
+            onPointerUp: findDanmaku,
+            behavior: HitTestBehavior.opaque,
             child: Stack(
               children: [
-                RepaintBoundary(
-                  child: ValueListenableBuilder(
+                RepaintBoundary.wrap(
+                  ValueListenableBuilder(
                     valueListenable: _notifier,
                     builder: (context, value, child) {
                       return CustomPaint(
@@ -539,9 +539,10 @@ class _DanmakuScreenState extends State<DanmakuScreen>
                       );
                     },
                   ),
+                  0,
                 ),
-                RepaintBoundary(
-                  child: ValueListenableBuilder(
+                RepaintBoundary.wrap(
+                  ValueListenableBuilder(
                     valueListenable: _staticDanmakuItems,
                     builder: (context, value, child) {
                       return CustomPaint(
@@ -560,9 +561,11 @@ class _DanmakuScreenState extends State<DanmakuScreen>
                       );
                     },
                   ),
+                  1,
                 ),
-                RepaintBoundary(
-                  child: ValueListenableBuilder(
+                RepaintBoundary.wrap(
+                  IgnorePointer(
+                      child: ValueListenableBuilder(
                     valueListenable: _notifier, // 与滚动弹幕共用控制器
                     builder: (context, value, child) {
                       return CustomPaint(
@@ -578,7 +581,8 @@ class _DanmakuScreenState extends State<DanmakuScreen>
                         size: Size.infinite,
                       );
                     },
-                  ),
+                  )),
+                  2,
                 ),
               ],
             ),
@@ -586,6 +590,46 @@ class _DanmakuScreenState extends State<DanmakuScreen>
         );
       },
     );
+  }
+
+  Iterable<DanmakuItem> hitDanmaku(
+      List<DanmakuItem> danmakuItems, Offset position) sync* {
+    if (danmakuItems.isNotEmpty) {
+      final dy = position.dy;
+      for (var i in danmakuItems) {
+        final double danmakuY0;
+        final double danmakuY1;
+        if (i.content.type == DanmakuItemType.bottom) {
+          danmakuY1 = _viewHeight - i.yPosition;
+          danmakuY0 = danmakuY1 - i.height;
+        } else {
+          assert(i.content.type != DanmakuItemType.special);
+          danmakuY0 = i.yPosition;
+          danmakuY1 = danmakuY0 + i.height;
+        }
+
+        if (danmakuY0 <= dy && dy <= danmakuY1) {
+          final dx = position.dx;
+          if (i.xPosition <= dx && dx <= i.xPosition + i.width) {
+            yield i;
+          }
+        }
+      }
+    }
+  }
+
+  void findDanmaku(PointerUpEvent event) {
+    if (_option.onTap != null || _option.onTapAll != null) {
+      final items = hitDanmaku(_staticDanmakuItems.value, event.localPosition)
+          .followedBy(hitDanmaku(_scrollDanmakuItems, event.localPosition));
+      if (_option.onTapAll != null) {
+        final item = items.toList();
+        if (item.isNotEmpty) _option.onTapAll!(item);
+      } else {
+        final item = items.firstOrNull;
+        if (item != null) _option.onTap!(item);
+      }
+    }
   }
 }
 

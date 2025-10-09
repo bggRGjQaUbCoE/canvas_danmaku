@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 import 'package:canvas_danmaku/models/danmaku_content_item.dart';
 import 'package:flutter/material.dart';
 
-abstract class DmUtils {
+abstract final class DmUtils {
   static final Random random = Random();
 
   static String generateRandomString(int length) {
