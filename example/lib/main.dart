@@ -77,6 +77,13 @@ class _HomePageState extends State<HomePage> {
   /// 为字幕预留空间
   bool _safeArea = true;
 
+  late final dmPadding = EdgeInsets.fromLTRB(
+    _random.nextDouble() * 50 + 10,
+    _random.nextDouble() * 50 + 10,
+    _random.nextDouble() * 50 + 10,
+    _random.nextDouble() * 50 + 10,
+  );
+
   DanmakuItem? _suspendedDM;
   OverlayEntry? _overlayEntry;
   void _removeOverlay() {
@@ -86,9 +93,9 @@ class _HomePageState extends State<HomePage> {
     _overlayEntry = null;
   }
 
-  static const spacing = 10.0;
-  static const width = 150.0;
-  static const height = 45.0;
+  static const overlaySpacing = 10.0;
+  static const overlayWidth = 150.0;
+  static const overlayHeight = 45.0;
 
   Widget _overlayItem(String text, {required VoidCallback onTap}) {
     return GestureDetector(
@@ -300,12 +307,7 @@ class _HomePageState extends State<HomePage> {
           ),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                _random.nextDouble() * 50 + 10,
-                _random.nextDouble() * 50 + 10,
-                _random.nextDouble() * 50 + 10,
-                _random.nextDouble() * 50 + 10,
-              ),
+              padding: dmPadding,
               child: Listener(
                 onPointerUp: (event) {
                   if (_controller == null) return;
@@ -349,18 +351,18 @@ class _HomePageState extends State<HomePage> {
                         return Positioned(
                           top: dy + item.height + dySpacing,
                           left: clampDouble(
-                            event.position.dx - height,
-                            spacing + dxSpacing,
+                            event.position.dx - overlayHeight,
+                            overlaySpacing + dxSpacing,
                             _controller!.viewWidth -
-                                width -
-                                spacing +
+                                overlayWidth -
+                                overlaySpacing +
                                 dxSpacing,
                           ),
                           child: Material(
                             color: item.content.color,
                             child: SizedBox(
-                              width: width,
-                              height: height,
+                              width: overlayWidth,
+                              height: overlayHeight,
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
@@ -505,7 +507,7 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-              const Text("Opacity : "),
+              Text("Opacity : $_opacity"),
               Slider(
                 value: _opacity,
                 min: 0.1,
@@ -521,7 +523,7 @@ class _HomePageState extends State<HomePage> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Font Size : "),
+                      Text("Font Size : $_fontSize"),
                       Slider(
                         value: _fontSize,
                         min: 8,
@@ -571,7 +573,7 @@ class _HomePageState extends State<HomePage> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Static Duration : "),
+                      Text("Static Duration : $_staticDuration"),
                       Slider(
                         value: _staticDuration.toDouble(),
                         min: 1,
