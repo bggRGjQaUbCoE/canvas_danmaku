@@ -34,8 +34,6 @@ class ScrollDanmakuPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final startPosition = size.width;
-
     late final ui.PictureRecorder pictureRecorder;
     final Canvas pictureCanvas;
     final batch = scrollDanmakuItems.length > batchThreshold;
@@ -53,6 +51,7 @@ class ScrollDanmakuPainter extends CustomPainter {
       }
 
       if (!item.suspend) {
+        final startPosition = size.width;
         item
           ..drawTick ??= tick
           ..generateParagraphIfNeeded(fontSize, fontWeight);

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:canvas_danmaku/canvas_danmaku.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -76,6 +77,15 @@ class _HomePageState extends State<HomePage> {
   /// 为字幕预留空间
   bool _safeArea = true;
 
+  DanmakuItem? _suspendedDM;
+  OverlayEntry? _overlayEntry;
+  void _removeOverlay() {
+    _suspendedDM?.suspend = false;
+    _suspendedDM = null;
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,9 +104,9 @@ class _HomePageState extends State<HomePage> {
                     _controller?.addDanmaku(
                       DanmakuContentItem(
                         "这是一条超长弹幕ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789这是一条超长的弹幕，这条弹幕会超出屏幕宽度",
-                        isColorful: true,
-                        color: Colors.white,
-                        // color: getRandomColor(),
+                        // isColorful: true,
+                        // color: Colors.white,
+                        color: getRandomColor(),
                         count: [1, 10, 100, 1000, 10000][_random.nextInt(5)],
                       ),
                     );
@@ -108,9 +118,9 @@ class _HomePageState extends State<HomePage> {
                     _controller?.addDanmaku(
                       DanmakuContentItem(
                         "这是一条顶部弹幕",
-                        // color: getRandomColor(),
-                        isColorful: true,
-                        color: Colors.white,
+                        color: getRandomColor(),
+                        // isColorful: true,
+                        // color: Colors.white,
                         type: DanmakuItemType.top,
                         count: [1, 10, 100, 1000, 10000][_random.nextInt(5)],
                       ),
@@ -123,9 +133,9 @@ class _HomePageState extends State<HomePage> {
                     _controller?.addDanmaku(
                       DanmakuContentItem(
                         "这是一条底部弹幕",
-                        // color: getRandomColor(),
-                        isColorful: true,
-                        color: Colors.white,
+                        color: getRandomColor(),
+                        // isColorful: true,
+                        // color: Colors.white,
                         type: DanmakuItemType.bottom,
                         count: [1, 10, 100, 1000, 10000][_random.nextInt(5)],
                       ),
@@ -264,6 +274,7 @@ class _HomePageState extends State<HomePage> {
                   icon: const Icon(Icons.clear),
                   onPressed: () {
                     _controller?.clear();
+                    _removeOverlay();
                   },
                   tooltip: 'Clear',
                 ),
@@ -271,45 +282,101 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Expanded(
-            child: Listener(
-              onPointerUp: (event) {
-                final items = _controller
-                    ?.findDanmaku(event.localPosition)
-                    .toList();
-                if (items != null && items.isNotEmpty) {
-                  for (var i in items) {
-                    i.suspend = true;
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                _random.nextDouble() * 50 + 10,
+                _random.nextDouble() * 50 + 10,
+                _random.nextDouble() * 50 + 10,
+                _random.nextDouble() * 50 + 10,
+              ),
+              child: Listener(
+                onPointerUp: (event) {
+                  if (_controller == null) return;
+
+                  // final items = _controller
+                  //     !.findDanmaku(event.localPosition)
+                  //     .toList();
+                  // if (items != null && items.isNotEmpty) {
+                  //   for (var i in items) {
+                  //     i.suspend = true;
+                  //   }
+                  //   debugPrint(items.toString());
+                  // Future.delayed(const Duration(seconds: 3), () {
+                  //   for (var i in items) {
+                  //     i.suspend = false;
+                  //   }
+                  // });
+                  // }
+
+                  /// single
+                  final item = _controller!.findSingleDanmaku(
+                    event.localPosition,
+                  );
+
+                  if (item == null) {
+                    _removeOverlay();
+                  } else if (item != _suspendedDM) {
+                    _removeOverlay();
+                    item.suspend = true;
+                    _suspendedDM = item;
+
+                    const spacing = 10.0;
+                    const width = 50.0;
+                    const height = 25.0;
+
+                    final dy = item.content.type == DanmakuItemType.bottom
+                        ? _controller!.viewHeight - item.yPosition - item.height
+                        : item.yPosition;
+                    final dySpacing =
+                        event.position.dy - event.localPosition.dy;
+                    final dxSpacing =
+                        event.position.dx - event.localPosition.dx;
+                    _overlayEntry = OverlayEntry(
+                      builder: (context) {
+                        return Positioned(
+                          top: dy + item.height + dySpacing,
+                          left: clampDouble(
+                            event.position.dx - height,
+                            spacing + dxSpacing,
+                            _controller!.viewWidth -
+                                width -
+                                spacing +
+                                dxSpacing,
+                          ),
+                          child: Container(
+                            width: width,
+                            height: height,
+                            color: getRandomColor(),
+                          ),
+                        );
+                      },
+                    );
+                    Overlay.of(context).insert(_overlayEntry!);
                   }
-                  debugPrint(items.toString());
-                  Future.delayed(const Duration(seconds: 3), () {
-                    for (var i in items) {
-                      i.suspend = false;
-                    }
-                  });
-                }
-              },
-              child: ColoredBox(
-                color: Colors.grey,
-                child: AnimatedOpacity(
-                  opacity: _opacity,
-                  duration: const Duration(milliseconds: 100),
-                  child: DanmakuScreen(
-                    key: _danmuKey,
-                    createdController: (DanmakuController e) {
-                      _controller = e;
-                    },
-                    option: DanmakuOption(
-                      fontSize: _fontSize,
-                      fontWeight: _fontWeight,
-                      duration: _duration,
-                      staticDuration: _staticDuration,
-                      strokeWidth: _strokeWidth,
-                      massiveMode: _massiveMode,
-                      hideScroll: _hideScroll,
-                      hideTop: _hideTop,
-                      hideBottom: _hideBottom,
-                      safeArea: _safeArea,
-                      lineHeight: _lineHeight,
+                },
+                child: ColoredBox(
+                  color: Colors.grey,
+                  child: AnimatedOpacity(
+                    opacity: _opacity,
+                    duration: const Duration(milliseconds: 100),
+                    child: DanmakuScreen(
+                      key: _danmuKey,
+                      createdController: (DanmakuController e) {
+                        _controller = e;
+                      },
+                      option: DanmakuOption(
+                        fontSize: _fontSize,
+                        fontWeight: _fontWeight,
+                        duration: _duration,
+                        staticDuration: _staticDuration,
+                        strokeWidth: _strokeWidth,
+                        massiveMode: _massiveMode,
+                        hideScroll: _hideScroll,
+                        hideTop: _hideTop,
+                        hideBottom: _hideBottom,
+                        safeArea: _safeArea,
+                        lineHeight: _lineHeight,
+                      ),
                     ),
                   ),
                 ),

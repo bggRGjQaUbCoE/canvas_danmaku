@@ -85,6 +85,9 @@ class _DanmakuScreenState extends State<DanmakuScreen>
       getOption: () => _option,
       isRunning: () => _running,
       findDanmaku: findDanmaku,
+      findSingleDanmaku: findSingleDanmaku,
+      getViewWidth: () => _viewWidth,
+      getViewHeight: () => _viewHeight,
     ));
   }
 
@@ -508,9 +511,9 @@ class _DanmakuScreenState extends State<DanmakuScreen>
       builder: (context, constraints) {
         /// 计算视图宽度
         _viewWidth = constraints.maxWidth;
-        final viewHeigh = constraints.maxHeight;
-        if (_viewHeight != viewHeigh) {
-          _viewHeight = viewHeigh;
+        final viewHeight = constraints.maxHeight;
+        if (_viewHeight != viewHeight) {
+          _viewHeight = viewHeight;
           _calcTracks();
         }
 
@@ -617,9 +620,40 @@ class _DanmakuScreenState extends State<DanmakuScreen>
     }
   }
 
+  DanmakuItem? hitSingleDanmaku(
+      List<DanmakuItem> danmakuItems, Offset position) {
+    if (danmakuItems.isNotEmpty) {
+      final dy = position.dy;
+      for (var i in danmakuItems) {
+        final double danmakuY0;
+        final double danmakuY1;
+        if (i.content.type == DanmakuItemType.bottom) {
+          danmakuY1 = _viewHeight - i.yPosition;
+          danmakuY0 = danmakuY1 - i.height;
+        } else {
+          assert(i.content.type != DanmakuItemType.special);
+          danmakuY0 = i.yPosition;
+          danmakuY1 = danmakuY0 + i.height;
+        }
+
+        if (danmakuY0 <= dy && dy <= danmakuY1) {
+          final dx = position.dx;
+          if (i.xPosition <= dx && dx <= i.xPosition + i.width) {
+            return i;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   Iterable<DanmakuItem> findDanmaku(Offset pos) =>
       hitDanmaku(_staticDanmakuItems.value, pos)
           .followedBy(hitDanmaku(_scrollDanmakuItems, pos));
+
+  DanmakuItem? findSingleDanmaku(Offset pos) =>
+      hitSingleDanmaku(_staticDanmakuItems.value, pos) ??
+      hitSingleDanmaku(_scrollDanmakuItems, pos);
 }
 
 class ListValueNotifier<T> extends ValueNotifier<List<T>> {
