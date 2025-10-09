@@ -526,6 +526,7 @@ class _DanmakuScreenState extends State<DanmakuScreen>
                     valueListenable: _notifier,
                     builder: (context, value, child) {
                       return CustomPaint(
+                        willChange: _running,
                         painter: ScrollDanmakuPainter(
                           length: _scrollDanmakuItems.length,
                           scrollDanmakuItems: _scrollDanmakuItems,
@@ -571,6 +572,7 @@ class _DanmakuScreenState extends State<DanmakuScreen>
                     valueListenable: _notifier, // 与滚动弹幕共用控制器
                     builder: (context, value, child) {
                       return CustomPaint(
+                        willChange: _running,
                         painter: SpecialDanmakuPainter(
                           length: _specialDanmakuItems.length,
                           specialDanmakuItems: _specialDanmakuItems,
