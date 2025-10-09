@@ -86,6 +86,23 @@ class _HomePageState extends State<HomePage> {
     _overlayEntry = null;
   }
 
+  static const spacing = 10.0;
+  static const width = 150.0;
+  static const height = 45.0;
+
+  Widget _overlayItem(String text, {required VoidCallback onTap}) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Center(
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -320,10 +337,6 @@ class _HomePageState extends State<HomePage> {
                     item.suspend = true;
                     _suspendedDM = item;
 
-                    const spacing = 10.0;
-                    const width = 50.0;
-                    const height = 25.0;
-
                     final dy = item.content.type == DanmakuItemType.bottom
                         ? _controller!.viewHeight - item.yPosition - item.height
                         : item.yPosition;
@@ -343,10 +356,32 @@ class _HomePageState extends State<HomePage> {
                                 spacing +
                                 dxSpacing,
                           ),
-                          child: Container(
-                            width: width,
-                            height: height,
-                            color: getRandomColor(),
+                          child: Material(
+                            color: item.content.color,
+                            child: SizedBox(
+                              width: width,
+                              height: height,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  _overlayItem('Report', onTap: _removeOverlay),
+                                  const VerticalDivider(width: 1),
+                                  _overlayItem(
+                                    'Copy',
+                                    onTap: () {
+                                      Clipboard.setData(
+                                        ClipboardData(text: item.content.text),
+                                      );
+                                      _removeOverlay();
+                                    },
+                                  ),
+                                  const VerticalDivider(width: 1),
+                                  _overlayItem('Close', onTap: _removeOverlay),
+                                ],
+                              ),
+                            ),
                           ),
                         );
                       },
