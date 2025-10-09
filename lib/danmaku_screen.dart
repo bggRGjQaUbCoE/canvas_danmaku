@@ -269,7 +269,7 @@ class _DanmakuScreenState extends State<DanmakuScreen>
             strokeParagraph: null,
           ),
         );
-        if (!_ticker.muted) {
+        if (_running) {
           if (!_ticker.isActive) {
             _ticker.start();
           }
