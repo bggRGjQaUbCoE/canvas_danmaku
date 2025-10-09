@@ -28,6 +28,8 @@ class DanmakuItem {
 
   bool expired = false;
 
+  bool suspend = false;
+
   bool needRemove(bool needRemove) {
     if (needRemove) {
       dispose();

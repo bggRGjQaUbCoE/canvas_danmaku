@@ -84,6 +84,7 @@ class _DanmakuScreenState extends State<DanmakuScreen>
       clear: _clear,
       getOption: () => _option,
       isRunning: () => _running,
+      findDanmaku: findDanmaku,
     ));
   }
 
@@ -464,9 +465,9 @@ class _DanmakuScreenState extends State<DanmakuScreen>
           (item.drawTick != null &&
               (tick - item.drawTick!) >= _option.durationInMilliseconds)));
       // 移除静态弹幕
-      _staticDanmakuItems.removeWhere((item) => item.needRemove(
+      _staticDanmakuItems.removeWhere((item) => item.needRemove(!item.suspend &&
           item.drawTick != null &&
-              (tick - item.drawTick!) >= _option.staticDurationInMilliseconds));
+          (tick - item.drawTick!) >= _option.staticDurationInMilliseconds));
       // 移除高级弹幕
       _specialDanmakuItems.removeWhere((item) {
         if (item.content case SpecialDanmakuContentItem e) {
@@ -514,9 +515,7 @@ class _DanmakuScreenState extends State<DanmakuScreen>
         }
 
         return ClipRect(
-          child: Listener(
-            onPointerUp: findDanmaku,
-            behavior: HitTestBehavior.opaque,
+          child: IgnorePointer(
             child: Stack(
               children: [
                 RepaintBoundary.wrap(
@@ -618,19 +617,9 @@ class _DanmakuScreenState extends State<DanmakuScreen>
     }
   }
 
-  void findDanmaku(PointerUpEvent event) {
-    if (_option.onTap != null || _option.onTapAll != null) {
-      final items = hitDanmaku(_staticDanmakuItems.value, event.localPosition)
-          .followedBy(hitDanmaku(_scrollDanmakuItems, event.localPosition));
-      if (_option.onTapAll != null) {
-        final item = items.toList();
-        if (item.isNotEmpty) _option.onTapAll!(item);
-      } else {
-        final item = items.firstOrNull;
-        if (item != null) _option.onTap!(item);
-      }
-    }
-  }
+  Iterable<DanmakuItem> findDanmaku(Offset pos) =>
+      hitDanmaku(_staticDanmakuItems.value, pos)
+          .followedBy(hitDanmaku(_scrollDanmakuItems, pos));
 }
 
 class ListValueNotifier<T> extends ValueNotifier<List<T>> {

@@ -1,4 +1,5 @@
 import 'package:canvas_danmaku/models/danmaku_content_item.dart';
+import 'package:canvas_danmaku/models/danmaku_item.dart';
 import 'package:canvas_danmaku/models/danmaku_option.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +11,7 @@ class DanmakuController {
   final VoidCallback clear;
   final DanmakuOption Function() getOption;
   final bool Function() isRunning;
+  final Iterable<DanmakuItem> Function(Offset) findDanmaku;
 
   DanmakuOption get option => getOption();
 
@@ -23,5 +25,6 @@ class DanmakuController {
     required this.clear,
     required this.getOption,
     required this.isRunning,
+    required this.findDanmaku,
   });
 }

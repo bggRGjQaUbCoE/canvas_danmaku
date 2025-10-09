@@ -271,33 +271,46 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Expanded(
-            child: ColoredBox(
-              color: Colors.grey,
-              child: AnimatedOpacity(
-                opacity: _opacity,
-                duration: const Duration(milliseconds: 100),
-                child: DanmakuScreen(
-                  key: _danmuKey,
-                  createdController: (DanmakuController e) {
-                    _controller = e
-                      ..updateOption(
-                        e.option.copyWith(
-                          onTapAll: (v) => debugPrint(v.toString()),
-                        ),
-                      );
-                  },
-                  option: DanmakuOption(
-                    fontSize: _fontSize,
-                    fontWeight: _fontWeight,
-                    duration: _duration,
-                    staticDuration: _staticDuration,
-                    strokeWidth: _strokeWidth,
-                    massiveMode: _massiveMode,
-                    hideScroll: _hideScroll,
-                    hideTop: _hideTop,
-                    hideBottom: _hideBottom,
-                    safeArea: _safeArea,
-                    lineHeight: _lineHeight,
+            child: Listener(
+              onPointerUp: (event) {
+                final items = _controller
+                    ?.findDanmaku(event.localPosition)
+                    .toList();
+                if (items != null && items.isNotEmpty) {
+                  for (var i in items) {
+                    i.suspend = true;
+                  }
+                  debugPrint(items.toString());
+                  Future.delayed(const Duration(seconds: 3), () {
+                    for (var i in items) {
+                      i.suspend = false;
+                    }
+                  });
+                }
+              },
+              child: ColoredBox(
+                color: Colors.grey,
+                child: AnimatedOpacity(
+                  opacity: _opacity,
+                  duration: const Duration(milliseconds: 100),
+                  child: DanmakuScreen(
+                    key: _danmuKey,
+                    createdController: (DanmakuController e) {
+                      _controller = e;
+                    },
+                    option: DanmakuOption(
+                      fontSize: _fontSize,
+                      fontWeight: _fontWeight,
+                      duration: _duration,
+                      staticDuration: _staticDuration,
+                      strokeWidth: _strokeWidth,
+                      massiveMode: _massiveMode,
+                      hideScroll: _hideScroll,
+                      hideTop: _hideTop,
+                      hideBottom: _hideBottom,
+                      safeArea: _safeArea,
+                      lineHeight: _lineHeight,
+                    ),
                   ),
                 ),
               ),

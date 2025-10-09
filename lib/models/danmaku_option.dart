@@ -1,5 +1,3 @@
-import 'package:canvas_danmaku/models/danmaku_item.dart';
-
 class DanmakuOption {
   /// 默认的字体大小
   final double fontSize;
@@ -43,10 +41,6 @@ class DanmakuOption {
   /// 弹幕行高
   final double lineHeight;
 
-  final void Function(DanmakuItem)? onTap;
-
-  final void Function(List<DanmakuItem>)? onTapAll;
-
   const DanmakuOption({
     this.fontSize = 16,
     this.fontWeight = 4,
@@ -61,11 +55,8 @@ class DanmakuOption {
     this.massiveMode = false,
     this.safeArea = true,
     this.lineHeight = 1.6,
-    this.onTap,
-    this.onTapAll,
   })  : durationInMilliseconds = duration * 1000,
-        staticDurationInMilliseconds = staticDuration * 1000,
-        assert(onTap == null || onTapAll == null);
+        staticDurationInMilliseconds = staticDuration * 1000;
 
   DanmakuOption copyWith({
     double? fontSize,
@@ -81,8 +72,6 @@ class DanmakuOption {
     bool? massiveMode,
     bool? safeArea,
     double? lineHeight,
-    void Function(DanmakuItem)? onTap,
-    void Function(List<DanmakuItem>)? onTapAll,
   }) {
     return DanmakuOption(
       area: area ?? this.area,
@@ -98,8 +87,6 @@ class DanmakuOption {
       massiveMode: massiveMode ?? this.massiveMode,
       safeArea: safeArea ?? this.safeArea,
       lineHeight: lineHeight ?? this.lineHeight,
-      onTap: onTap ?? this.onTap,
-      onTapAll: onTapAll ?? this.onTapAll,
     );
   }
 }
