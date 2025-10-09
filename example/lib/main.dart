@@ -94,17 +94,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   static const overlaySpacing = 10.0;
-  static const overlayWidth = 150.0;
-  static const overlayHeight = 45.0;
+  static const overlayWidth = 130.0;
+  static const overlayHeight = 35.0;
 
-  Widget _overlayItem(String text, {required VoidCallback onTap}) {
+  Widget _overlayItem(Widget child, {required VoidCallback onTap}) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
-      child: Center(
-        child: Text(
-          text,
-          style: const TextStyle(color: Colors.white),
+      child: SizedBox(
+        height: overlayHeight,
+        width: overlayWidth / 3,
+        child: Center(
+          child: child,
         ),
       ),
     );
@@ -351,39 +352,76 @@ class _HomePageState extends State<HomePage> {
                         return Positioned(
                           top: dy + item.height + dySpacing,
                           left: clampDouble(
-                            event.position.dx - overlayHeight,
+                            event.position.dx - overlayWidth / 2,
                             overlaySpacing + dxSpacing,
                             _controller!.viewWidth -
                                 overlayWidth -
                                 overlaySpacing +
                                 dxSpacing,
                           ),
-                          child: Material(
-                            color: item.content.color,
-                            child: SizedBox(
-                              width: overlayWidth,
-                              height: overlayHeight,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  _overlayItem('Report', onTap: _removeOverlay),
-                                  const VerticalDivider(width: 1),
-                                  _overlayItem(
-                                    'Copy',
-                                    onTap: () {
-                                      Clipboard.setData(
-                                        ClipboardData(text: item.content.text),
-                                      );
-                                      _removeOverlay();
-                                    },
-                                  ),
-                                  const VerticalDivider(width: 1),
-                                  _overlayItem('Close', onTap: _removeOverlay),
-                                ],
+                          child: Column(
+                            children: [
+                              CustomPaint(
+                                painter: TrianglePainter(Colors.black54),
+                                size: const Size(12, 6),
                               ),
-                            ),
+                              Container(
+                                width: overlayWidth,
+                                height: overlayHeight,
+                                decoration: const BoxDecoration(
+                                  color: Colors.black54,
+                                  borderRadius: BorderRadiusGeometry.all(
+                                    Radius.circular(18),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    _overlayItem(
+                                      const Icon(
+                                        size: 20,
+                                        Icons.thumb_up_off_alt_outlined,
+                                        color: Colors.white,
+                                      ),
+                                      onTap: () {
+                                        _removeOverlay();
+                                        print('on thumb up');
+                                      },
+                                    ),
+                                    _overlayItem(
+                                      const Icon(
+                                        size: 20,
+                                        Icons.copy,
+                                        color: Colors.white,
+                                      ),
+                                      onTap: () {
+                                        Clipboard.setData(
+                                          ClipboardData(
+                                            text: item.content.text,
+                                          ),
+                                        );
+                                        _removeOverlay();
+                                        print('on copy');
+                                      },
+                                    ),
+                                    _overlayItem(
+                                      const Icon(
+                                        size: 20,
+                                        Icons.report_problem_outlined,
+                                        color: Colors.white,
+                                      ),
+                                      onTap: () {
+                                        _removeOverlay();
+                                        print('on report');
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         );
                       },
@@ -766,4 +804,27 @@ class _HomePageState extends State<HomePage> {
     timer?.cancel();
     super.dispose();
   }
+}
+
+class TrianglePainter extends CustomPainter {
+  TrianglePainter(this.color);
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final path = Path()
+      ..moveTo(0, size.height)
+      ..lineTo(size.width, size.height)
+      ..lineTo(size.width / 2, 0)
+      ..close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(TrianglePainter oldDelegate) => color != oldDelegate.color;
 }
