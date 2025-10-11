@@ -295,7 +295,6 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   void _clear() {
     if (!mounted) return;
     _clearDanmakus();
-    _notifier.refresh();
     if (_ticker.isActive) {
       // SchedulerBinding.instance.addPostFrameCallback(
       //   (_) => _ticker.stop(),
@@ -499,6 +498,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                       return CustomPaint(
                         willChange: _running,
                         painter: ScrollDanmakuPainter(
+                          length: _scrollDanmakuItems.length,
                           danmakuItems: _scrollDanmakuItems,
                           durationInMilliseconds:
                               _option.durationInMilliseconds,
@@ -542,6 +542,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                       return CustomPaint(
                         willChange: _running,
                         painter: SpecialDanmakuPainter(
+                          length: _specialDanmakuItems.length,
                           danmakuItems: _specialDanmakuItems,
                           fontSize: _option.fontSize,
                           fontWeight: _option.fontWeight,

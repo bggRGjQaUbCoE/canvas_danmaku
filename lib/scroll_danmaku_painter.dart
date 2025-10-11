@@ -14,6 +14,7 @@ final class ScrollDanmakuPainter extends BaseDanmakuPainter {
     ..color = Colors.green;
 
   ScrollDanmakuPainter({
+    required super.length,
     required super.danmakuItems,
     required this.durationInMilliseconds,
     required super.fontSize,

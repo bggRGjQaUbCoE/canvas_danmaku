@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 final class SpecialDanmakuPainter extends BaseDanmakuPainter {
   SpecialDanmakuPainter({
+    required super.length,
     required super.danmakuItems,
     required super.fontSize,
     required super.fontWeight,

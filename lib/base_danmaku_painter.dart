@@ -4,6 +4,7 @@ import 'package:canvas_danmaku/canvas_danmaku.dart';
 import 'package:flutter/material.dart';
 
 abstract base class BaseDanmakuPainter extends CustomPainter {
+  final int length;
   final List<DanmakuItem> danmakuItems;
   final double fontSize;
   final int fontWeight;
@@ -13,6 +14,7 @@ abstract base class BaseDanmakuPainter extends CustomPainter {
   final int tick;
 
   const BaseDanmakuPainter({
+    required this.length,
     required this.danmakuItems,
     required this.fontSize,
     required this.fontWeight,
@@ -51,7 +53,8 @@ abstract base class BaseDanmakuPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant BaseDanmakuPainter oldDelegate) {
-    return (running && (oldDelegate.running || danmakuItems.isNotEmpty)) ||
+    return (running && oldDelegate.length != 0) ||
+        oldDelegate.tick == tick ||
         oldDelegate.fontSize != fontSize ||
         oldDelegate.fontWeight != fontWeight ||
         oldDelegate.strokeWidth != strokeWidth;
