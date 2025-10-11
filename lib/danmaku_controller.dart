@@ -3,16 +3,16 @@ import 'package:canvas_danmaku/models/danmaku_item.dart';
 import 'package:canvas_danmaku/models/danmaku_option.dart';
 import 'package:flutter/material.dart';
 
-class DanmakuController {
-  final ValueChanged<DanmakuContentItem> addDanmaku;
+class DanmakuController<T> {
+  final ValueChanged<DanmakuContentItem<T>> addDanmaku;
   final ValueChanged<DanmakuOption> updateOption;
   final VoidCallback pause;
   final VoidCallback resume;
   final VoidCallback clear;
   final DanmakuOption Function() getOption;
   final bool Function() isRunning;
-  final Iterable<DanmakuItem> Function(Offset) findDanmaku;
-  final DanmakuItem? Function(Offset) findSingleDanmaku;
+  final Iterable<DanmakuItem<T>> Function(Offset) findDanmaku;
+  final DanmakuItem<T>? Function(Offset) findSingleDanmaku;
   final double Function() getViewWidth;
   final double Function() getViewHeight;
 
