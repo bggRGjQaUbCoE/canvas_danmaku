@@ -34,7 +34,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   double _viewHeight = 0;
 
   /// 弹幕配置
-  late final DanmakuOption _option;
+  DanmakuOption _option = const DanmakuOption();
 
   /// 滚动弹幕
   final _scrollDanmakuItems = <DanmakuItem<T>>[];
@@ -43,7 +43,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   final _staticDanmakuItems = ListValueNotifier(<DanmakuItem<T>>[]);
 
   /// 高级弹幕
-  final List<DanmakuItem> _specialDanmakuItems = <DanmakuItem<T>>[];
+  final _specialDanmakuItems = <DanmakuItem<T>>[];
 
   /// 弹幕高度
   late double _danmakuHeight;
@@ -85,6 +85,9 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
       findSingleDanmaku: findSingleDanmaku,
       getViewWidth: () => _viewWidth,
       getViewHeight: () => _viewHeight,
+      scrollDanmaku: _scrollDanmakuItems,
+      staticDanmaku: _staticDanmakuItems.value,
+      specialDanmaku: _specialDanmakuItems,
     ));
   }
 

@@ -16,6 +16,10 @@ class DanmakuController<T> {
   final double Function() getViewWidth;
   final double Function() getViewHeight;
 
+  final List<DanmakuItem<T>> scrollDanmaku;
+  final List<DanmakuItem<T>> staticDanmaku;
+  final List<DanmakuItem<T>> specialDanmaku;
+
   DanmakuOption get option => getOption();
 
   bool get running => isRunning();
@@ -36,5 +40,8 @@ class DanmakuController<T> {
     required this.findSingleDanmaku,
     required this.getViewWidth,
     required this.getViewHeight,
+    required this.scrollDanmaku,
+    required this.staticDanmaku,
+    required this.specialDanmaku,
   });
 }
