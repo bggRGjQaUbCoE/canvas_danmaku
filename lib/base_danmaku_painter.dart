@@ -54,7 +54,7 @@ abstract base class BaseDanmakuPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant BaseDanmakuPainter oldDelegate) {
     return (running && oldDelegate.length != 0) ||
-        oldDelegate.tick == tick ||
+        oldDelegate.length != length ||
         oldDelegate.fontSize != fontSize ||
         oldDelegate.fontWeight != fontWeight ||
         oldDelegate.strokeWidth != strokeWidth;
