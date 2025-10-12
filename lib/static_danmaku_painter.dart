@@ -4,6 +4,7 @@ import 'package:canvas_danmaku/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 final class StaticDanmakuPainter extends CustomPainter {
+  final int length;
   final List<DanmakuItem> danmakuItems;
   final double staticDurationInMilliseconds;
   final double fontSize;
@@ -17,6 +18,7 @@ final class StaticDanmakuPainter extends CustomPainter {
     ..color = Colors.green;
 
   StaticDanmakuPainter({
+    required this.length,
     required this.danmakuItems,
     required this.staticDurationInMilliseconds,
     required this.fontSize,
@@ -142,5 +144,9 @@ final class StaticDanmakuPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_) => true;
+  bool shouldRepaint(covariant StaticDanmakuPainter oldDelegate) =>
+      oldDelegate.length != length ||
+      oldDelegate.fontSize != fontSize ||
+      oldDelegate.fontWeight != fontWeight ||
+      oldDelegate.strokeWidth != strokeWidth;
 }

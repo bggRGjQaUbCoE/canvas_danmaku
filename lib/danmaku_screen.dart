@@ -523,6 +523,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                     builder: (context, value, child) {
                       return CustomPaint(
                         painter: StaticDanmakuPainter(
+                          length: value.length,
                           danmakuItems: value,
                           staticDurationInMilliseconds:
                               _option.staticDurationInMilliseconds,
