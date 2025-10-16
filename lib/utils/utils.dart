@@ -160,46 +160,88 @@ abstract final class DmUtils {
     final paragraph = builder.build()
       ..layout(const ui.ParagraphConstraints(width: double.infinity));
 
+    final Rect rect;
+
     final rec = ui.PictureRecorder();
-    // TODO: record rotated image
-    ui.Canvas(rec)
-      ..scale(devicePixelRatio)
-      ..drawParagraph(
-        paragraph,
-        Offset(strokeWidth / 2, strokeWidth / 2),
+    final canvas = ui.Canvas(rec)..scale(devicePixelRatio);
+    if (content.rotateZ != 0 || content.matrix != null) {
+      rect = _calculateRotatedBounds(
+        paragraph.maxIntrinsicWidth + strokeWidth,
+        paragraph.height + strokeWidth,
+        content.rotateZ,
+        content.matrix,
       );
+      canvas.translate(strokeWidth / 2 - rect.left, strokeWidth / 2 - rect.top);
+      if (content.matrix != null) {
+        canvas.transform(content.matrix!.storage);
+      } else {
+        canvas.rotate(content.rotateZ);
+      }
+      canvas.drawParagraph(paragraph, Offset.zero);
+    } else {
+      rect = Rect.fromLTRB(0, 0, paragraph.maxIntrinsicWidth, paragraph.height);
+      canvas.drawParagraph(paragraph, Offset(strokeWidth / 2, strokeWidth / 2));
+    }
+    content.rect = rect;
 
     final pic = rec.endRecording();
     final img = pic.toImageSync(
-      ((paragraph.maxIntrinsicWidth + strokeWidth) * devicePixelRatio).ceil(),
-      ((paragraph.height + strokeWidth) * devicePixelRatio).ceil(),
+      (rect.width * devicePixelRatio).ceil(),
+      (rect.height * devicePixelRatio).ceil(),
     );
     pic.dispose();
     return img;
   }
 
-  // static (double, double) _calcRotatedSize(
-  //   double w,
-  //   double h,
-  //   double rotateZ,
-  //   Matrix4? matrix,
-  // ) {
-  //   final double cosZ;
-  //   final double cosY;
-  //   final double sinZ;
-  //   if (matrix == null) {
-  //     cosZ = cos(rotateZ);
-  //     sinZ = sin(rotateZ);
-  //     cosY = 1;
-  //   } else {
-  //     cosZ = matrix[5];
-  //     sinZ = matrix[1];
-  //     cosY = matrix[10];
-  //   }
+  static Rect _calculateRotatedBounds(
+    double w,
+    double h,
+    double rotateZ,
+    Matrix4? matrix,
+  ) {
+    final double cosZ;
+    final double cosY;
+    final double sinZ;
+    if (matrix == null) {
+      cosZ = cos(rotateZ);
+      sinZ = sin(rotateZ);
+      cosY = 1;
+    } else {
+      cosZ = matrix[5];
+      sinZ = matrix[1];
+      cosY = matrix[10];
+    }
 
-  //   final rotatedWidth = (w * cosZ * cosY + h * sinZ * cosY).abs();
-  //   final rotatedHeight = (w * sinZ + h * cosZ).abs();
+    final wx = w * cosZ * cosY;
+    final wy = w * sinZ;
+    final hx = -h * sinZ * cosY;
+    final hy = h * cosZ;
 
-  //   return (rotatedWidth, rotatedHeight);
-  // }
+    final minX = _min4(0.0, wx, hx, wx + hx);
+    final maxX = _max4(0.0, wx, hx, wx + hx);
+    final minY = _min4(0.0, wy, hy, wy + hy);
+    final maxY = _max4(0.0, wy, hy, wy + hy);
+
+    return Rect.fromLTRB(minX, minY, maxX, maxY);
+  }
+
+  @pragma("vm:prefer-inline")
+  static double _min4(double a, double b, double c, double d) {
+    final ab = a < b ? a : b;
+    final cd = c < d ? c : d;
+    return ab < cd ? ab : cd;
+  }
+
+  @pragma("vm:prefer-inline")
+  static double _max4(double a, double b, double c, double d) {
+    final ab = a > b ? a : b;
+    final cd = c > d ? c : d;
+    return ab > cd ? ab : cd;
+  }
+
+  static void tweenAdd(Tween<double> tween, double value) {
+    tween
+      ..begin = tween.begin! + value
+      ..end = tween.end! + value;
+  }
 }
