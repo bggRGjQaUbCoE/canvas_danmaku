@@ -1,10 +1,9 @@
-import 'dart:math';
+import 'dart:math' show min;
 import 'dart:ui' as ui;
 
 import 'package:canvas_danmaku/base_danmaku_painter.dart';
 import 'package:canvas_danmaku/models/danmaku_content_item.dart';
 import 'package:canvas_danmaku/models/danmaku_item.dart';
-import 'package:canvas_danmaku/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 final class SpecialDanmakuPainter extends BaseDanmakuPainter {
@@ -34,28 +33,14 @@ final class SpecialDanmakuPainter extends BaseDanmakuPainter {
   void _paintSpecialDanmaku(Canvas canvas, DanmakuItem dm,
       SpecialDanmakuContentItem item, Size size, int elapsed) {
     // 透明度动画
-    late final alpha =
-        item.alphaTween?.transform(elapsed / item.duration) ?? item.color.a;
     final color = item.alphaTween == null
         ? item.color
-        : item.color.withValues(alpha: alpha);
-    // 文本
-    final ui.Paragraph paragraph;
-    if (color != item.color) {
-      dm.paragraph?.dispose();
-      item.color = color;
-      paragraph = dm.paragraph = DmUtils.generateSpecialParagraph(
-          content: item,
-          fontWeight: fontWeight,
-          elapsed: elapsed,
-          strokeWidth: strokeWidth);
-    } else {
-      paragraph = dm.paragraph!;
-    }
+        : item.color.withValues(
+            alpha: item.alphaTween!.transform(
+            elapsed / item.duration,
+          ));
 
-    // 路径动画 TODO
-
-    // else 位移动画
+    // 位移动画
     final double dx, dy;
     if (elapsed > item.translationStartDelay) {
       late final translateProgress = item.easingType.transform(min(1.0,
@@ -82,10 +67,10 @@ final class SpecialDanmakuPainter extends BaseDanmakuPainter {
         canvas.rotate(item.rotateZ);
       }
       canvas
-        ..drawParagraph(paragraph, Offset.zero)
+        ..drawImage(dm.image!, Offset.zero, Paint()..color = color)
         ..restore();
     } else {
-      canvas.drawParagraph(paragraph, Offset(dx, dy));
+      canvas.drawImage(dm.image!, Offset(dx, dy), Paint()..color = color);
     }
   }
 }
