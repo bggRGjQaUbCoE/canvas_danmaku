@@ -1,3 +1,4 @@
+import 'package:canvas_danmaku/base_danmaku_painter.dart';
 import 'package:canvas_danmaku/models/danmaku_content_item.dart';
 import 'package:canvas_danmaku/models/danmaku_item.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ final class StaticDanmakuPainter extends CustomPainter {
   final double fontSize;
   final int fontWeight;
   final double strokeWidth;
+  final double devicePixelRatio;
   final int tick;
 
   late final Paint selfSendPaint = Paint()
@@ -23,6 +25,7 @@ final class StaticDanmakuPainter extends CustomPainter {
     required this.fontSize,
     required this.fontWeight,
     required this.strokeWidth,
+    required this.devicePixelRatio,
     required this.tick,
   });
 
@@ -31,17 +34,22 @@ final class StaticDanmakuPainter extends CustomPainter {
     for (var item in danmakuItems) {
       item
         ..drawTick ??= tick
-        ..drawParagraphIfNeeded(fontSize, fontWeight, strokeWidth)
+        ..drawParagraphIfNeeded(
+          fontSize,
+          fontWeight,
+          strokeWidth,
+          devicePixelRatio,
+        )
         ..xPosition = (size.width - item.width) / 2;
 
-      canvas.drawImage(
-        item.image!,
-        Offset(
-          item.xPosition,
-          item.content.type == DanmakuItemType.bottom
-              ? size.height - item.yPosition - item.height
-              : item.yPosition,
-        ),
+      BaseDanmakuPainter.paintImg(
+        canvas,
+        item,
+        item.xPosition,
+        item.content.type == DanmakuItemType.bottom
+            ? size.height - item.yPosition - item.height
+            : item.yPosition,
+        devicePixelRatio,
         Paint(),
       );
     }
@@ -52,5 +60,6 @@ final class StaticDanmakuPainter extends CustomPainter {
       oldDelegate.length != length ||
       oldDelegate.fontSize != fontSize ||
       oldDelegate.fontWeight != fontWeight ||
-      oldDelegate.strokeWidth != strokeWidth;
+      oldDelegate.strokeWidth != strokeWidth ||
+      oldDelegate.devicePixelRatio != devicePixelRatio;
 }

@@ -62,6 +62,7 @@ abstract final class DmUtils {
     required double fontSize,
     required int fontWeight,
     required double strokeWidth,
+    required double devicePixelRatio,
   }) {
     double w = contentParagraph.maxIntrinsicWidth + strokeWidth;
     double h = contentParagraph.height + strokeWidth;
@@ -72,7 +73,7 @@ abstract final class DmUtils {
     );
 
     final rec = ui.PictureRecorder();
-    final canvas = ui.Canvas(rec);
+    final canvas = ui.Canvas(rec)..scale(devicePixelRatio);
 
     if (strokeWidth != 0) {
       final builder = ui.ParagraphBuilder(ui.ParagraphStyle(
@@ -125,7 +126,10 @@ abstract final class DmUtils {
     }
 
     final pic = rec.endRecording();
-    final img = pic.toImageSync(w.ceil(), h.ceil());
+    final img = pic.toImageSync(
+      (w * devicePixelRatio).ceil(),
+      (h * devicePixelRatio).ceil(),
+    );
     pic.dispose();
     return img;
   }
@@ -134,6 +138,7 @@ abstract final class DmUtils {
     required SpecialDanmakuContentItem content,
     required int fontWeight,
     required double strokeWidth,
+    required double devicePixelRatio,
   }) {
     final ui.ParagraphBuilder builder = ui.ParagraphBuilder(
       ui.ParagraphStyle(
@@ -157,15 +162,17 @@ abstract final class DmUtils {
 
     final rec = ui.PictureRecorder();
     // TODO: record rotated image
-    ui.Canvas(rec).drawParagraph(
-      paragraph,
-      Offset(strokeWidth / 2, strokeWidth / 2),
-    );
+    ui.Canvas(rec)
+      ..scale(devicePixelRatio)
+      ..drawParagraph(
+        paragraph,
+        Offset(strokeWidth / 2, strokeWidth / 2),
+      );
 
     final pic = rec.endRecording();
     final img = pic.toImageSync(
-      (paragraph.maxIntrinsicWidth + strokeWidth).ceil(),
-      (paragraph.height + strokeWidth).ceil(),
+      ((paragraph.maxIntrinsicWidth + strokeWidth) * devicePixelRatio).ceil(),
+      ((paragraph.height + strokeWidth) * devicePixelRatio).ceil(),
     );
     pic.dispose();
     return img;

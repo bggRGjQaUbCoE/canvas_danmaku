@@ -19,6 +19,7 @@ final class ScrollDanmakuPainter extends BaseDanmakuPainter {
     required super.fontSize,
     required super.fontWeight,
     required super.strokeWidth,
+    required super.devicePixelRatio,
     required super.running,
     required super.tick,
     super.batchThreshold,
@@ -26,7 +27,12 @@ final class ScrollDanmakuPainter extends BaseDanmakuPainter {
 
   @override
   void paintDanmaku(ui.Canvas canvas, ui.Size size, DanmakuItem item) {
-    item.drawParagraphIfNeeded(fontSize, fontWeight, strokeWidth);
+    item.drawParagraphIfNeeded(
+      fontSize,
+      fontWeight,
+      strokeWidth,
+      devicePixelRatio,
+    );
     if (!item.suspend) {
       final startPosition = size.width;
       final endPosition = -item.width;
@@ -41,9 +47,12 @@ final class ScrollDanmakuPainter extends BaseDanmakuPainter {
       }
     }
 
-    canvas.drawImage(
-      item.image!,
-      Offset(item.xPosition, item.yPosition),
+    BaseDanmakuPainter.paintImg(
+      canvas,
+      item,
+      item.xPosition,
+      item.yPosition,
+      devicePixelRatio,
       Paint(),
     );
 

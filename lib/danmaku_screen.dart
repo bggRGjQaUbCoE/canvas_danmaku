@@ -31,6 +31,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   /// 视图宽度
   double _viewWidth = 0;
   double _viewHeight = 0;
+  double devicePixelRatio = 1;
 
   /// 弹幕配置
   DanmakuOption _option = const DanmakuOption();
@@ -89,6 +90,24 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
       staticDanmaku: _staticDanmakuItems.value,
       specialDanmaku: _specialDanmakuItems,
     ));
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
+    if (devicePixelRatio != this.devicePixelRatio) {
+      this.devicePixelRatio = devicePixelRatio;
+      for (var item in _scrollDanmakuItems) {
+        item.dispose();
+      }
+      for (var item in _staticDanmakuItems.value) {
+        item.dispose();
+      }
+      for (var item in _specialDanmakuItems) {
+        item.dispose();
+      }
+    }
   }
 
   int _time = 0;
@@ -150,6 +169,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
           fontSize: _option.fontSize,
           fontWeight: _option.fontWeight,
           strokeWidth: _option.strokeWidth,
+          devicePixelRatio: devicePixelRatio,
         ));
 
     for (var i = 0; i < _trackYPositions.length; i++) {
@@ -239,6 +259,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                 content: content as SpecialDanmakuContentItem,
                 fontWeight: _option.fontWeight,
                 strokeWidth: _option.strokeWidth,
+                devicePixelRatio: devicePixelRatio,
               )),
         );
         if (_running) {
@@ -338,10 +359,13 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
     /// 清理已经存在的 Paragraph 缓存
     if (clearParagraph) {
       DmUtils.updateSelfSendPaint(_option.strokeWidth);
-      for (DanmakuItem item in _scrollDanmakuItems) {
+      for (var item in _scrollDanmakuItems) {
         item.dispose();
       }
-      for (DanmakuItem item in _staticDanmakuItems.value) {
+      for (var item in _staticDanmakuItems.value) {
+        item.dispose();
+      }
+      for (var item in _specialDanmakuItems) {
         item.dispose();
       }
     }
@@ -485,6 +509,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                           fontSize: _option.fontSize,
                           fontWeight: _option.fontWeight,
                           strokeWidth: _option.strokeWidth,
+                          devicePixelRatio: devicePixelRatio,
                           running: _running,
                           tick: value,
                         ),
@@ -507,6 +532,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                           fontSize: _option.fontSize,
                           fontWeight: _option.fontWeight,
                           strokeWidth: _option.strokeWidth,
+                          devicePixelRatio: devicePixelRatio,
                           tick: _notifier.value,
                         ),
                         size: Size.infinite,
@@ -528,6 +554,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                           fontSize: _option.fontSize,
                           fontWeight: _option.fontWeight,
                           strokeWidth: _option.strokeWidth,
+                          devicePixelRatio: devicePixelRatio,
                           running: _running,
                           tick: value,
                         ),

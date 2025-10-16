@@ -13,6 +13,7 @@ final class SpecialDanmakuPainter extends BaseDanmakuPainter {
     required super.fontSize,
     required super.fontWeight,
     required super.strokeWidth,
+    required super.devicePixelRatio,
     required super.running,
     required super.tick,
     super.batchThreshold,
@@ -66,11 +67,27 @@ final class SpecialDanmakuPainter extends BaseDanmakuPainter {
       } else {
         canvas.rotate(item.rotateZ);
       }
-      canvas
-        ..drawImage(dm.image!, Offset.zero, Paint()..color = color)
-        ..restore();
+      paintImg(canvas, dm.image!, 0, 0, Paint()..color = color);
+      canvas.restore();
     } else {
-      canvas.drawImage(dm.image!, Offset(dx, dy), Paint()..color = color);
+      paintImg(canvas, dm.image!, dx, dy, Paint()..color = color);
+    }
+  }
+
+  void paintImg(
+      ui.Canvas canvas, ui.Image image, double dx, double dy, Paint paint) {
+    if (devicePixelRatio == 1.0) {
+      canvas.drawImage(image, Offset(dx, dy), paint);
+    } else {
+      final src =
+          Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble());
+      final dst = Rect.fromLTWH(
+        dx,
+        dy,
+        image.width / devicePixelRatio,
+        image.height / devicePixelRatio,
+      );
+      canvas.drawImageRect(image, src, dst, paint);
     }
   }
 }
