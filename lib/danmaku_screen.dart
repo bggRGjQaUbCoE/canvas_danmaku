@@ -66,6 +66,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   void initState() {
     super.initState();
     _option = widget.option;
+    DmUtils.updateSelfSendPaint(_option.strokeWidth);
 
     _danmakuHeight = _textPainter.height;
 
@@ -336,6 +337,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
 
     /// 清理已经存在的 Paragraph 缓存
     if (clearParagraph) {
+      DmUtils.updateSelfSendPaint(_option.strokeWidth);
       for (DanmakuItem item in _scrollDanmakuItems) {
         item.dispose();
       }
