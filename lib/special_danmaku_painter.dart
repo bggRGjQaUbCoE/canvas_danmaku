@@ -61,18 +61,27 @@ final class SpecialDanmakuPainter extends BaseDanmakuPainter {
     dx += item.rect.left;
     dy += item.rect.top;
 
-    dm.image ??= DmUtils.recordSpecialDanmakuImg(
-      content: item,
-      fontWeight: fontWeight,
-      strokeWidth: strokeWidth,
-      devicePixelRatio: devicePixelRatio,
+    paintImg(
+      canvas,
+      dm.image ??= DmUtils.recordSpecialDanmakuImg(
+        content: item,
+        fontWeight: fontWeight,
+        strokeWidth: strokeWidth,
+        devicePixelRatio: devicePixelRatio,
+      ),
+      dx,
+      dy,
+      Paint()..color = color,
     );
-
-    paintImg(canvas, dm.image!, dx, dy, Paint()..color = color);
   }
 
   void paintImg(
-      ui.Canvas canvas, ui.Image image, double dx, double dy, Paint paint) {
+    ui.Canvas canvas,
+    ui.Image image,
+    double dx,
+    double dy,
+    Paint paint,
+  ) {
     if (devicePixelRatio == 1.0) {
       canvas.drawImage(image, Offset(dx, dy), paint);
     } else {

@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 abstract final class DmUtils {
   static final Random random = Random();
 
+  static const maxRasterizeSize = 8192.0;
+
   static String generateRandomString(int length) {
     const characters = '0123456789abcdefghijklmnopqrstuvwxyz';
 
@@ -140,14 +142,12 @@ abstract final class DmUtils {
     required double strokeWidth,
     required double devicePixelRatio,
   }) {
-    final ui.ParagraphBuilder builder = ui.ParagraphBuilder(
-      ui.ParagraphStyle(
-        textAlign: TextAlign.left,
-        fontWeight: FontWeight.values[fontWeight],
-        textDirection: TextDirection.ltr,
-        fontSize: content.fontSize,
-      ),
-    )
+    final builder = ui.ParagraphBuilder(ui.ParagraphStyle(
+      textAlign: TextAlign.left,
+      fontWeight: FontWeight.values[fontWeight],
+      textDirection: TextDirection.ltr,
+      fontSize: content.fontSize,
+    ))
       ..pushStyle(ui.TextStyle(
         color: content.color,
         fontSize: content.fontSize,
@@ -160,36 +160,60 @@ abstract final class DmUtils {
     final paragraph = builder.build()
       ..layout(const ui.ParagraphConstraints(width: double.infinity));
 
-    final Rect rect;
+    final strokeOffset = strokeWidth / 2;
+    final totalWidth = paragraph.maxIntrinsicWidth + strokeWidth;
+    final totalHeight = paragraph.height + strokeWidth;
 
     final rec = ui.PictureRecorder();
-    final canvas = ui.Canvas(rec)..scale(devicePixelRatio);
+    final canvas = ui.Canvas(rec);
+
+    final Rect rect;
+    double adjuestDevicePixelRatio = devicePixelRatio;
+
     if (content.rotateZ != 0 || content.matrix != null) {
       rect = _calculateRotatedBounds(
-        paragraph.maxIntrinsicWidth + strokeWidth,
-        paragraph.height + strokeWidth,
+        totalWidth,
+        totalHeight,
         content.rotateZ,
         content.matrix,
       );
-      canvas.translate(strokeWidth / 2 - rect.left, strokeWidth / 2 - rect.top);
-      if (content.matrix != null) {
-        canvas.transform(content.matrix!.storage);
+
+      final imgLongestSide = rect.size.longestSide * devicePixelRatio;
+      if (imgLongestSide > maxRasterizeSize) {
+        // force resize
+        adjuestDevicePixelRatio = maxRasterizeSize / imgLongestSide;
+      }
+      canvas
+        ..scale(adjuestDevicePixelRatio)
+        ..translate(strokeOffset - rect.left, strokeOffset - rect.top);
+
+      if (content.matrix case final matrix?) {
+        canvas.transform(matrix.storage);
       } else {
         canvas.rotate(content.rotateZ);
       }
       canvas.drawParagraph(paragraph, Offset.zero);
     } else {
-      rect = Rect.fromLTRB(0, 0, paragraph.maxIntrinsicWidth, paragraph.height);
-      canvas.drawParagraph(paragraph, Offset(strokeWidth / 2, strokeWidth / 2));
+      rect = Rect.fromLTRB(0, 0, totalWidth, totalHeight);
+
+      final imgLongestSide = totalWidth * devicePixelRatio;
+      if (imgLongestSide > maxRasterizeSize) {
+        final scale = maxRasterizeSize / imgLongestSide;
+        adjuestDevicePixelRatio = scale;
+      }
+      canvas
+        ..scale(adjuestDevicePixelRatio)
+        ..drawParagraph(paragraph, Offset(strokeOffset, strokeOffset));
     }
+
     content.rect = rect;
 
+    final imgSize = rect.size * adjuestDevicePixelRatio;
     final pic = rec.endRecording();
-    final img = pic.toImageSync(
-      (rect.width * devicePixelRatio).ceil(),
-      (rect.height * devicePixelRatio).ceil(),
-    );
+    final img = pic.toImageSync(imgSize.width.ceil(), imgSize.height.ceil());
     pic.dispose();
+    paragraph.dispose();
+
     return img;
   }
 
