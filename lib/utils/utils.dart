@@ -141,6 +141,7 @@ abstract final class DmUtils {
     required int fontWeight,
     required double strokeWidth,
     required double devicePixelRatio,
+    required Size playerSize,
   }) {
     final builder = ui.ParagraphBuilder(ui.ParagraphStyle(
       textAlign: TextAlign.left,
@@ -170,15 +171,24 @@ abstract final class DmUtils {
     final Rect rect;
     double adjuestDevicePixelRatio = devicePixelRatio;
 
+    final Size imgSize;
     if (content.rotateZ != 0 || content.matrix != null) {
-      rect = _calculateRotatedBounds(
+      final translatedRect = _calculateRotatedBounds(
         totalWidth,
         totalHeight,
         content.rotateZ,
         content.matrix,
       );
 
-      final imgLongestSide = rect.size.longestSide * devicePixelRatio;
+      rect = _calculateCroppedImageSize(
+        playerSize,
+        translatedRect,
+        content.translateXTween,
+        content.translateYTween,
+      );
+
+      imgSize = rect.size * devicePixelRatio;
+      final imgLongestSide = imgSize.longestSide;
       if (imgLongestSide > maxRasterizeSize) {
         // force resize
         adjuestDevicePixelRatio = maxRasterizeSize / imgLongestSide;
@@ -194,9 +204,16 @@ abstract final class DmUtils {
       }
       canvas.drawParagraph(paragraph, Offset.zero);
     } else {
-      rect = Rect.fromLTRB(0, 0, totalWidth, totalHeight);
+      rect = _calculateCroppedImageSize(
+        playerSize,
+        Rect.fromLTRB(0, 0, totalWidth, totalHeight),
+        content.translateXTween,
+        content.translateYTween,
+      );
 
-      final imgLongestSide = totalWidth * devicePixelRatio;
+      imgSize = rect.size * devicePixelRatio;
+
+      final imgLongestSide = imgSize.longestSide;
       if (imgLongestSide > maxRasterizeSize) {
         final scale = maxRasterizeSize / imgLongestSide;
         adjuestDevicePixelRatio = scale;
@@ -208,7 +225,6 @@ abstract final class DmUtils {
 
     content.rect = rect;
 
-    final imgSize = rect.size * adjuestDevicePixelRatio;
     final pic = rec.endRecording();
     final img = pic.toImageSync(imgSize.width.ceil(), imgSize.height.ceil());
     pic.dispose();
@@ -263,9 +279,31 @@ abstract final class DmUtils {
     return ab > cd ? ab : cd;
   }
 
-  static void tweenAdd(Tween<double> tween, double value) {
-    tween
-      ..begin = tween.begin! + value
-      ..end = tween.end! + value;
+  static Rect _calculateCroppedImageSize(
+    Size windowSize,
+    Rect rect,
+    Tween<double> xTween,
+    Tween<double> yTween,
+  ) {
+    final imgSize = rect.size;
+
+    double maxX =
+        max(xTween.begin!, xTween.end!) * windowSize.width + rect.left;
+    double maxY =
+        max(yTween.begin!, yTween.end!) * windowSize.height + rect.top;
+
+    double minX =
+        min(xTween.begin!, xTween.end!) * windowSize.width + rect.left;
+    double minY =
+        min(yTween.begin!, yTween.end!) * windowSize.height + rect.top;
+
+    double left = max(0, -maxX);
+    double top = max(0, -maxY);
+    double right = min(imgSize.width, windowSize.width - minX);
+    double bottom = min(imgSize.height, windowSize.height - minY);
+
+    assert(right > left && bottom > top);
+
+    return Rect.fromLTRB(left, top, right, bottom).shift(rect.topLeft);
   }
 }

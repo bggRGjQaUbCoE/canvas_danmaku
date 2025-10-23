@@ -260,6 +260,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                 fontWeight: _option.fontWeight,
                 strokeWidth: _option.strokeWidth,
                 devicePixelRatio: devicePixelRatio,
+                playerSize: Size(_viewWidth, _viewHeight),
               )),
         );
         if (_running) {

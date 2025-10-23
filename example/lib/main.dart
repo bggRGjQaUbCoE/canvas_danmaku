@@ -261,6 +261,28 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
                 TextButton(
+                  child: const Text('Big'),
+                  onPressed: () {
+                    _controller!.addDanmaku(
+                      SpecialDanmakuContentItem(
+                        '测',
+                        duration: 1000,
+                        color: Colors.red,
+                        fontSize: 728,
+                        translateXTween: ConstantTween<double>(0.8),
+                        translateYTween: ConstantTween<double>(0.6),
+                        alphaTween: Tween<double>(begin: 1, end: 0),
+                        matrix: Matrix4.identity()
+                          ..rotateZ(pi / 4)
+                          ..rotateY(-pi),
+                        easingType: Curves.linear,
+                        hasStroke: true,
+                        extra: _random.nextInt(2147483647),
+                      ),
+                    );
+                  },
+                ),
+                TextButton(
                   child: const Text('Self'),
                   onPressed: () {
                     _controller?.addDanmaku(

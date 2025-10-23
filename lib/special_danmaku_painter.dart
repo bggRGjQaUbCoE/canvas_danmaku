@@ -68,6 +68,7 @@ final class SpecialDanmakuPainter extends BaseDanmakuPainter {
         fontWeight: fontWeight,
         strokeWidth: strokeWidth,
         devicePixelRatio: devicePixelRatio,
+        playerSize: size,
       ),
       dx,
       dy,
