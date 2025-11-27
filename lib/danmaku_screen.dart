@@ -163,14 +163,16 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
         width: danmakuWidth,
         height: danmakuHeight,
         content: content,
-        image: DmUtils.recordDanmakuImage(
-          contentParagraph: paragraph,
-          content: content,
-          fontSize: _option.fontSize,
-          fontWeight: _option.fontWeight,
-          strokeWidth: _option.strokeWidth,
-          devicePixelRatio: devicePixelRatio,
-        ));
+        image: _option.hideSpecial
+            ? null
+            : DmUtils.recordDanmakuImage(
+                contentParagraph: paragraph,
+                content: content,
+                fontSize: _option.fontSize,
+                fontWeight: _option.fontWeight,
+                strokeWidth: _option.strokeWidth,
+                devicePixelRatio: devicePixelRatio,
+              ));
 
     for (var i = 0; i < _trackYPositions.length; i++) {
       final yPosition = _trackYPositions[i];
@@ -542,8 +544,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                   1,
                 ),
                 RepaintBoundary.wrap(
-                  IgnorePointer(
-                      child: ValueListenableBuilder(
+                  ValueListenableBuilder(
                     valueListenable: _notifier, // 与滚动弹幕共用控制器
                     builder: (context, value, child) {
                       return CustomPaint(
@@ -561,7 +562,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                         size: Size.infinite,
                       );
                     },
-                  )),
+                  ),
                   2,
                 ),
               ],
