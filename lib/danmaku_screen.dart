@@ -255,14 +255,12 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
               width: 0,
               height: 0,
               content: content,
-              image: _option.hideSpecial
-                  ? null
-                  : DmUtils.recordSpecialDanmakuImg(
-                      content: content as SpecialDanmakuContentItem,
-                      fontWeight: _option.fontWeight,
-                      strokeWidth: _option.strokeWidth,
-                      devicePixelRatio: devicePixelRatio,
-                    )),
+              image: DmUtils.recordSpecialDanmakuImg(
+                content: content as SpecialDanmakuContentItem,
+                fontWeight: _option.fontWeight,
+                strokeWidth: _option.strokeWidth,
+                devicePixelRatio: devicePixelRatio,
+              )),
         );
         if (_running) {
           if (!_ticker.isActive) {
