@@ -163,16 +163,14 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
         width: danmakuWidth,
         height: danmakuHeight,
         content: content,
-        image: _option.hideSpecial
-            ? null
-            : DmUtils.recordDanmakuImage(
-                contentParagraph: paragraph,
-                content: content,
-                fontSize: _option.fontSize,
-                fontWeight: _option.fontWeight,
-                strokeWidth: _option.strokeWidth,
-                devicePixelRatio: devicePixelRatio,
-              ));
+        image: DmUtils.recordDanmakuImage(
+          contentParagraph: paragraph,
+          content: content,
+          fontSize: _option.fontSize,
+          fontWeight: _option.fontWeight,
+          strokeWidth: _option.strokeWidth,
+          devicePixelRatio: devicePixelRatio,
+        ));
 
     for (var i = 0; i < _trackYPositions.length; i++) {
       final yPosition = _trackYPositions[i];
@@ -257,12 +255,14 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
               width: 0,
               height: 0,
               content: content,
-              image: DmUtils.recordSpecialDanmakuImg(
-                content: content as SpecialDanmakuContentItem,
-                fontWeight: _option.fontWeight,
-                strokeWidth: _option.strokeWidth,
-                devicePixelRatio: devicePixelRatio,
-              )),
+              image: _option.hideSpecial
+                  ? null
+                  : DmUtils.recordSpecialDanmakuImg(
+                      content: content as SpecialDanmakuContentItem,
+                      fontWeight: _option.fontWeight,
+                      strokeWidth: _option.strokeWidth,
+                      devicePixelRatio: devicePixelRatio,
+                    )),
         );
         if (_running) {
           if (!_ticker.isActive) {
