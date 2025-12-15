@@ -36,7 +36,7 @@ abstract base class BaseDanmakuPainter extends CustomPainter {
     double devicePixelRatio,
   ) {
     final img = item.image!;
-    if (devicePixelRatio == 1.0) {
+    if (img.width == item.width.ceil()) {
       canvas.drawImage(img, Offset(dx, dy), _paint);
     } else {
       final src =
