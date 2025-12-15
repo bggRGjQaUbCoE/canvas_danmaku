@@ -73,6 +73,8 @@ final class SpecialDanmakuPainter extends BaseDanmakuPainter {
       ),
       dx,
       dy,
+      item.rect.width,
+      item.rect.height,
       _paint..color = color,
     );
   }
@@ -82,19 +84,16 @@ final class SpecialDanmakuPainter extends BaseDanmakuPainter {
     ui.Image image,
     double dx,
     double dy,
+    double imgW,
+    double imgH,
     Paint paint,
   ) {
-    if (devicePixelRatio == 1.0) {
+    if (image.width == imgW.ceil()) {
       canvas.drawImage(image, Offset(dx, dy), paint);
     } else {
       final src =
           Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble());
-      final dst = Rect.fromLTWH(
-        dx,
-        dy,
-        image.width / devicePixelRatio,
-        image.height / devicePixelRatio,
-      );
+      final dst = Rect.fromLTWH(dx, dy, imgW, imgH);
       canvas.drawImageRect(image, src, dst, paint);
     }
   }

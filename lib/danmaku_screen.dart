@@ -96,8 +96,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   void didChangeDependencies() {
     super.didChangeDependencies();
     final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
-    if (devicePixelRatio != this.devicePixelRatio) {
-      this.devicePixelRatio = devicePixelRatio;
+    if (devicePixelRatio > this.devicePixelRatio) {
       for (var item in _scrollDanmakuItems) {
         item.dispose();
       }
@@ -107,6 +106,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
       for (var item in _specialDanmakuItems) {
         item.dispose();
       }
+      this.devicePixelRatio = devicePixelRatio;
     }
   }
 
