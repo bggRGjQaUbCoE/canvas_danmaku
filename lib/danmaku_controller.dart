@@ -4,20 +4,21 @@ import 'package:canvas_danmaku/models/danmaku_option.dart';
 import 'package:flutter/material.dart';
 
 class DanmakuController<T> {
-  final ValueChanged<DanmakuContentItem<T>> addDanmaku;
+  final bool Function(DanmakuContentItem<T>) addDanmaku;
   final ValueChanged<DanmakuOption> updateOption;
   final VoidCallback pause;
   final VoidCallback resume;
   final VoidCallback clear;
-  final DanmakuOption Function() getOption;
-  final bool Function() isRunning;
-  final Iterable<DanmakuItem<T>> Function(Offset) findDanmaku;
-  final DanmakuItem<T>? Function(Offset) findSingleDanmaku;
-  final double Function() getViewWidth;
-  final double Function() getViewHeight;
+  final ValueGetter<DanmakuOption> getOption;
+  final ValueGetter<bool> isRunning;
+  final Iterable<(double, DanmakuItem<T>)> Function(Offset) findDanmaku;
+  final (double, DanmakuItem<T>)? Function(Offset) findSingleDanmaku;
+  final ValueGetter<double> getViewWidth;
+  final ValueGetter<double> getViewHeight;
+  final ValueGetter<int> getTrackCount;
 
-  final List<DanmakuItem<T>> scrollDanmaku;
-  final List<DanmakuItem<T>> staticDanmaku;
+  final List<List<DanmakuItem<T>>> scrollDanmaku;
+  final List<DanmakuItem<T>?> staticDanmaku;
   final List<DanmakuItem<T>> specialDanmaku;
 
   DanmakuOption get option => getOption();
@@ -27,6 +28,8 @@ class DanmakuController<T> {
   double get viewWidth => getViewWidth();
 
   double get viewHeight => getViewHeight();
+
+  int get trackCount => getTrackCount();
 
   DanmakuController({
     required this.addDanmaku,
@@ -40,6 +43,7 @@ class DanmakuController<T> {
     required this.findSingleDanmaku,
     required this.getViewWidth,
     required this.getViewHeight,
+    required this.getTrackCount,
     required this.scrollDanmaku,
     required this.staticDanmaku,
     required this.specialDanmaku,
