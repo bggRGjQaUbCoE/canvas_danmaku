@@ -34,7 +34,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   double devicePixelRatio = 1;
 
   /// 弹幕配置
-  DanmakuOption _option = const DanmakuOption();
+  late DanmakuOption _option;
 
   /// 滚动弹幕
   final _scrollDanmakuItems = <List<DanmakuItem<T>>>[];
@@ -70,6 +70,9 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   void initState() {
     super.initState();
     _option = widget.option;
+    _scrollVelocityOrDuration = _option.scrollFixedVelocity
+        ? -_viewWidth / _option.durationInMilliseconds
+        : _option.durationInMilliseconds;
     DmUtils.updateSelfSendPaint(_option.strokeWidth);
 
     _danmakuHeight = _textPainter.height;
@@ -301,7 +304,8 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
 
   /// 更新弹幕设置
   void _updateOption(DanmakuOption option) {
-    if (option.scrollFixedVelocity != _option.scrollFixedVelocity) {
+    if (option.durationInMilliseconds != _option.durationInMilliseconds ||
+        option.scrollFixedVelocity != _option.scrollFixedVelocity) {
       _scrollVelocityOrDuration = option.scrollFixedVelocity
           ? -_viewWidth / option.durationInMilliseconds
           : option.durationInMilliseconds;
@@ -485,10 +489,6 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
           _viewHeight = viewHeight;
           _calcTracks();
         }
-
-        _scrollVelocityOrDuration = _option.scrollFixedVelocity
-            ? -_viewWidth / _option.durationInMilliseconds
-            : _option.durationInMilliseconds;
 
         return ClipRect(
           child: IgnorePointer(
