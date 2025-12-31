@@ -70,9 +70,9 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   void initState() {
     super.initState();
     _option = widget.option;
-    _scrollVelocityOrDuration = _option.scrollFixedVelocity
-        ? -_viewWidth / _option.durationInMilliseconds
-        : _option.durationInMilliseconds;
+    if (!_option.scrollFixedVelocity) {
+      _scrollVelocityOrDuration = _option.durationInMilliseconds;
+    }
     DmUtils.updateSelfSendPaint(_option.strokeWidth);
 
     _danmakuHeight = _textPainter.height;
@@ -104,8 +104,8 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
     super.didChangeDependencies();
     final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
     if (devicePixelRatio > this.devicePixelRatio) {
-      for (var i = 0; i < _trackCount; i++) {
-        for (var e in _scrollDanmakuItems[i]) {
+      for (var i in _scrollDanmakuItems) {
+        for (var e in i) {
           e.dispose();
         }
       }
@@ -241,7 +241,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
       case DanmakuItemType.bottom:
         if (_option.hideWhat(content.type)) return false;
         added = _handleNormalDanmaku(content, _staticCanAddToTrack);
-        if (!added && _option.static2Scroll) {
+        if (!added && _option.static2Scroll && !_option.hideScroll) {
           added =
               _handleNormalDanmaku(content, _scrollCanAddToTrack, scroll: true);
         }
@@ -339,8 +339,8 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
         for (var e in i) {
           e.dispose();
         }
+        i.clear();
       }
-      _scrollDanmakuItems.clear();
     }
 
     final clearTop = option.hideTop && !_option.hideTop;
@@ -361,8 +361,8 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
     /// 清理已经存在的 Paragraph 缓存
     if (clearParagraph) {
       DmUtils.updateSelfSendPaint(_option.strokeWidth);
-      for (var i = 0; i < _trackCount; i++) {
-        for (var e in _scrollDanmakuItems[i]) {
+      for (var i in _scrollDanmakuItems) {
+        for (var e in i) {
           e.dispose();
         }
       }
@@ -393,11 +393,11 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   }
 
   void _clearDanmakus() {
-    for (var i = 0; i < _trackCount; i++) {
-      for (var e in _scrollDanmakuItems[i]) {
+    for (var i in _scrollDanmakuItems) {
+      for (var e in i) {
         e.dispose();
       }
-      _scrollDanmakuItems[i].clear();
+      i.clear();
     }
     for (int i = 0; i < _trackCount; i++) {
       final item = _staticDanmakuItems[i];
@@ -483,8 +483,15 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
     return LayoutBuilder(
       builder: (context, constraints) {
         /// 计算视图宽度
-        _viewWidth = constraints.maxWidth;
+        final viewWidth = constraints.maxWidth;
         final viewHeight = constraints.maxHeight;
+        if (_viewWidth != viewWidth) {
+          _viewWidth = viewWidth;
+          if (_option.scrollFixedVelocity) {
+            _scrollVelocityOrDuration =
+                -_viewWidth / _option.durationInMilliseconds;
+          }
+        }
         if (_viewHeight != viewHeight) {
           _viewHeight = viewHeight;
           _calcTracks();
