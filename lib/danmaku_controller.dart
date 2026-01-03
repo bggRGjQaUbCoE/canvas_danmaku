@@ -13,8 +13,6 @@ class DanmakuController<T> {
   final ValueGetter<bool> isRunning;
   final Iterable<(double, DanmakuItem<T>)> Function(Offset) findDanmaku;
   final (double, DanmakuItem<T>)? Function(Offset) findSingleDanmaku;
-  final ValueGetter<double> getViewWidth;
-  final ValueGetter<double> getViewHeight;
   final ValueGetter<int> getTrackCount;
 
   final List<List<DanmakuItem<T>>> scrollDanmaku;
@@ -24,10 +22,6 @@ class DanmakuController<T> {
   DanmakuOption get option => getOption();
 
   bool get running => isRunning();
-
-  double get viewWidth => getViewWidth();
-
-  double get viewHeight => getViewHeight();
 
   int get trackCount => getTrackCount();
 
@@ -41,8 +35,6 @@ class DanmakuController<T> {
     required this.isRunning,
     required this.findDanmaku,
     required this.findSingleDanmaku,
-    required this.getViewWidth,
-    required this.getViewHeight,
     required this.getTrackCount,
     required this.scrollDanmaku,
     required this.staticDanmaku,

@@ -93,6 +93,8 @@ class _HomePageState extends State<HomePage> {
   //   _random.nextDouble() * 50 + 10,
   // );
 
+  double _viewWidth = 0;
+
   DanmakuItem? _suspendedDM;
   OverlayEntry? _overlayEntry;
   void _removeOverlay() {
@@ -469,7 +471,7 @@ class _HomePageState extends State<HomePage> {
                           left: clampDouble(
                             event.position.dx - overlayWidth / 2,
                             overlaySpacing + dxSpacing,
-                            _controller!.viewWidth -
+                            _viewWidth -
                                 overlayWidth -
                                 overlaySpacing +
                                 dxSpacing,
@@ -550,27 +552,30 @@ class _HomePageState extends State<HomePage> {
                     opacity: _opacity,
                     duration: const Duration(milliseconds: 100),
                     child: LayoutBuilder(
-                      builder: (_, constrains) => DanmakuScreen<int>(
-                        key: _danmuKey,
-                        createdController: (e) {
-                          _controller = e;
-                        },
-                        option: DanmakuOption(
-                          fontSize: _fontSize,
-                          fontWeight: _fontWeight,
-                          duration: _duration,
-                          staticDuration: _staticDuration,
-                          strokeWidth: _strokeWidth,
-                          massiveMode: _massiveMode,
-                          static2Scroll: _static2Scroll,
-                          hideScroll: _hideScroll,
-                          hideTop: _hideTop,
-                          hideBottom: _hideBottom,
-                          safeArea: _safeArea,
-                          lineHeight: _lineHeight,
-                        ),
-                        size: Size(constrains.maxWidth, constrains.maxHeight),
-                      ),
+                      builder: (_, constrains) {
+                        _viewWidth = constrains.maxWidth;
+                        return DanmakuScreen<int>(
+                          key: _danmuKey,
+                          createdController: (e) {
+                            _controller = e;
+                          },
+                          option: DanmakuOption(
+                            fontSize: _fontSize,
+                            fontWeight: _fontWeight,
+                            duration: _duration,
+                            staticDuration: _staticDuration,
+                            strokeWidth: _strokeWidth,
+                            massiveMode: _massiveMode,
+                            static2Scroll: _static2Scroll,
+                            hideScroll: _hideScroll,
+                            hideTop: _hideTop,
+                            hideBottom: _hideBottom,
+                            safeArea: _safeArea,
+                            lineHeight: _lineHeight,
+                          ),
+                          size: constrains.biggest,
+                        );
+                      },
                     ),
                   ),
                 ),

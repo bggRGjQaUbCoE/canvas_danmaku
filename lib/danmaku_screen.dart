@@ -89,8 +89,6 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
       isRunning: () => _running,
       findDanmaku: findDanmaku,
       findSingleDanmaku: findSingleDanmaku,
-      getViewWidth: () => _viewWidth,
-      getViewHeight: () => _viewHeight,
       getTrackCount: () => _trackCount,
       scrollDanmaku: _scrollDanmakuItems,
       staticDanmaku: _staticDanmakuItems.value,
@@ -582,16 +580,9 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   }
 
   Iterable<(double, DanmakuItem<T>)> findDanmaku(Offset position) sync* {
-    final index = position.dy *
-        (_trackCount + (_option.safeArea && _option.area == 1.0 ? 1 : 0)) ~/
-        (_viewHeight * _option.area);
+    final index = position.dy ~/ _danmakuHeight;
 
     if (index >= _trackCount) {
-      // assert((() => throw RangeError.range(
-      //       position.dy,
-      //       0,
-      //       (_trackCount * _trackHeight).toInt(),
-      //     ))());
       return;
     }
 
@@ -613,16 +604,9 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   }
 
   (double, DanmakuItem<T>)? findSingleDanmaku(Offset position) {
-    final index = position.dy *
-        (_trackCount + (_option.safeArea && _option.area == 1.0 ? 1 : 0)) ~/
-        (_viewHeight * _option.area);
+    final index = position.dy ~/ _danmakuHeight;
 
     if (index >= _trackCount) {
-      // assert((() => throw RangeError.range(
-      //       position.dy,
-      //       0,
-      //       (_trackCount * _trackHeight).toInt(),
-      //     ))());
       return null;
     }
 
