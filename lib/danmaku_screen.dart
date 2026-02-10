@@ -102,6 +102,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   void didChangeDependencies() {
     super.didChangeDependencies();
     final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
+    DmUtils.devicePixelRatio = devicePixelRatio;
     if (devicePixelRatio > this.devicePixelRatio) {
       for (var i in _scrollDanmakuItems) {
         for (var e in i) {
@@ -184,7 +185,6 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
           fontSize: _option.fontSize,
           fontWeight: _option.fontWeight,
           strokeWidth: _option.strokeWidth,
-          devicePixelRatio: devicePixelRatio,
         ));
 
     for (var i = 0; i < _trackCount; i++) {
@@ -257,7 +257,6 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                 content: content as SpecialDanmakuContentItem,
                 fontWeight: _option.fontWeight,
                 strokeWidth: _option.strokeWidth,
-                devicePixelRatio: devicePixelRatio,
               )),
         );
         if (_running && !_ticker.isActive) {
@@ -417,13 +416,14 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
     final item = _scrollDanmakuItems[index].lastOrNull;
     if (item == null) return true;
     // 首先保证进入屏幕时不发生重叠
-    if (_viewWidth < item.xPosition + item.width) {
+    final right = item.xPosition + item.width;
+    if (_viewWidth < right) {
       return false;
     }
     // 其次保证知道移出屏幕前不与速度慢的弹幕(弹幕宽度较小)发生重叠
     if (!_option.scrollFixedVelocity && item.width < newDanmakuWidth) {
       // (1 - ((_viewWidth - item.xPosition) / (item.width + _viewWidth))) > ((_viewWidth) / (_viewWidth + newDanmakuWidth))
-      if ((item.width + item.xPosition) * newDanmakuWidth >
+      if (right * newDanmakuWidth >
           _viewWidth * (_viewWidth - item.xPosition)) {
         return false;
       }
@@ -519,7 +519,6 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                     fontSize: _option.fontSize,
                     fontWeight: _option.fontWeight,
                     strokeWidth: _option.strokeWidth,
-                    devicePixelRatio: devicePixelRatio,
                     running: _running,
                     tick: value,
                   ),
@@ -543,7 +542,6 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                     fontSize: _option.fontSize,
                     fontWeight: _option.fontWeight,
                     strokeWidth: _option.strokeWidth,
-                    devicePixelRatio: devicePixelRatio,
                     tick: _notifier.value,
                   ),
                   size: widget.size,
@@ -564,7 +562,6 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                     fontSize: _option.fontSize,
                     fontWeight: _option.fontWeight,
                     strokeWidth: _option.strokeWidth,
-                    devicePixelRatio: devicePixelRatio,
                     running: _running,
                     tick: value,
                   ),

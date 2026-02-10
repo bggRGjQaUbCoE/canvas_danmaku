@@ -52,7 +52,6 @@ class DanmakuItem<T> {
     double fontSize,
     int fontWeight,
     double strokeWidth,
-    double devicePixelRatio,
   ) {
     if (image == null) {
       final paragraph = DmUtils.generateParagraph(
@@ -66,7 +65,6 @@ class DanmakuItem<T> {
         fontSize: fontSize,
         fontWeight: fontWeight,
         strokeWidth: strokeWidth,
-        devicePixelRatio: devicePixelRatio,
       );
       width = paragraph.maxIntrinsicWidth +
           strokeWidth +
