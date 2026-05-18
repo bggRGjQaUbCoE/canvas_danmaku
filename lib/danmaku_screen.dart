@@ -47,6 +47,11 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   /// 高级弹幕
   final _specialDanmakuItems = <DanmakuItem<T>>[];
 
+  bool get _isEmpty =>
+      _scrollDanmakuItems.every((list) => list.isEmpty) &&
+      _staticDanmakuItems.value.nonNulls.isEmpty &&
+      _specialDanmakuItems.isEmpty;
+
   /// 弹幕高度
   double _danmakuHeight = 0;
 
@@ -281,7 +286,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   void _resume() {
     if (!mounted) return;
     _running = true;
-    if (!_ticker.isActive) {
+    if (!_isEmpty && !_ticker.isActive) {
       _ticker.start();
     }
     _staticDanmakuItems.refresh();
@@ -440,20 +445,24 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   void _lazyTick(int tick) {
     // 移除屏幕外滚动弹幕
     for (var i in _scrollDanmakuItems) {
-      i.removeWhereUnsafe((item) => item.needRemove(item.expired));
+      i.removeWhereUnsafe((item) => item.needRemove(item.expired ||
+          // `paint()` is skipped when `opacity` is `0`, `expired` is always `false`
+          (!item.suspend &&
+              item.drawTick != null &&
+              (tick - item.drawTick!) >= _option.durationInMilliseconds)));
     }
     // 移除静态弹幕
     _staticDanmakuItems.removeWhere((item) => item.needRemove(!item.suspend &&
         item.drawTick != null &&
         (tick - item.drawTick!) >= _option.staticDurationInMilliseconds));
     // 移除高级弹幕
-    _specialDanmakuItems
-        .removeWhereUnsafe((item) => item.needRemove(item.expired));
+    _specialDanmakuItems.removeWhereUnsafe((item) => item.needRemove(
+        item.expired ||
+            (item.drawTick != null &&
+                (tick - item.drawTick!) >=
+                    (item.content as SpecialDanmakuContentItem).duration)));
     // 暂停动画
-    if (_scrollDanmakuItems.isEmpty &&
-        _specialDanmakuItems.isEmpty &&
-        _staticDanmakuItems.value.nonNulls.isEmpty &&
-        _ticker.isActive) {
+    if (_isEmpty && _ticker.isActive) {
       _lastTick = tick;
       _ticker.stop();
     }
