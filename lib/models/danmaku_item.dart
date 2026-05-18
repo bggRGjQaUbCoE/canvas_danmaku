@@ -3,9 +3,9 @@ import 'dart:ui' as ui;
 import 'package:canvas_danmaku/models/danmaku_content_item.dart';
 import 'package:canvas_danmaku/utils/utils.dart';
 
-class DanmakuItem<T> {
+class DanmakuItem {
   /// 弹幕内容
-  final DanmakuContentItem<T> content;
+  final DanmakuContentItem content;
 
   /// 弹幕宽度
   double width;
@@ -23,8 +23,6 @@ class DanmakuItem<T> {
   ui.Image? image;
 
   bool expired = false;
-
-  bool suspend = false;
 
   @pragma("vm:prefer-inline")
   bool needRemove(bool needRemove) {

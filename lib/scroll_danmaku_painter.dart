@@ -42,12 +42,6 @@ final class ScrollDanmakuPainter extends BaseDanmakuPainter {
       for (var i in danmakuItems[index]) {
         if (i.expired) continue;
 
-        if (i.suspend) {
-          suspend = i;
-          suspendIndex = index;
-          continue;
-        }
-
         paintDanmaku(pictureCanvas, size, i, index * trackHeight);
       }
     }
@@ -75,24 +69,22 @@ final class ScrollDanmakuPainter extends BaseDanmakuPainter {
       strokeWidth,
       devicePixelRatio,
     );
-    if (!item.suspend) {
-      final startPosition = size.width;
-      final endPosition = -item.width;
+    final startPosition = size.width;
+    final endPosition = -item.width;
 
-      if (durationInMilliseconds.isNegative) {
-        item.xPosition +=
-            (tick - (item.drawTick ??= tick)) * durationInMilliseconds;
-      } else {
-        final distance = startPosition - endPosition;
-        item.xPosition +=
-            (((item.drawTick ??= tick) - tick) / durationInMilliseconds) *
-                distance;
-      }
+    if (durationInMilliseconds.isNegative) {
+      item.xPosition +=
+          (tick - (item.drawTick ??= tick)) * durationInMilliseconds;
+    } else {
+      final distance = startPosition - endPosition;
+      item.xPosition +=
+          (((item.drawTick ??= tick) - tick) / durationInMilliseconds) *
+              distance;
+    }
 
-      if (item.xPosition < endPosition || item.xPosition > startPosition) {
-        item.expired = true;
-        return;
-      }
+    if (item.xPosition < endPosition || item.xPosition > startPosition) {
+      item.expired = true;
+      return;
     }
 
     BaseDanmakuPainter.paintImg(

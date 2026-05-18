@@ -5,15 +5,14 @@ import 'package:canvas_danmaku/models/danmaku_content_item.dart';
 import 'package:canvas_danmaku/models/danmaku_item.dart';
 import 'package:canvas_danmaku/models/danmaku_option.dart';
 import 'package:canvas_danmaku/scroll_danmaku_painter.dart';
-import 'package:canvas_danmaku/special_danmaku_painter.dart';
 import 'package:canvas_danmaku/static_danmaku_painter.dart';
 import 'package:canvas_danmaku/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-class DanmakuScreen<T> extends StatefulWidget {
+class DanmakuScreen extends StatefulWidget {
   // 创建Screen后返回控制器
-  final ValueChanged<DanmakuController<T>> createdController;
+  final ValueChanged<DanmakuController> createdController;
   final DanmakuOption option;
   final Size size;
 
@@ -25,10 +24,10 @@ class DanmakuScreen<T> extends StatefulWidget {
   });
 
   @override
-  State<DanmakuScreen<T>> createState() => _DanmakuScreenState<T>();
+  State<DanmakuScreen> createState() => _DanmakuScreenState();
 }
 
-class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
+class _DanmakuScreenState extends State<DanmakuScreen>
     with SingleTickerProviderStateMixin {
   /// 视图宽度
   double _viewWidth = 0;
@@ -39,13 +38,14 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   late DanmakuOption _option;
 
   /// 滚动弹幕
-  final _scrollDanmakuItems = <List<DanmakuItem<T>>>[];
+  final _scrollDanmakuItems = <List<DanmakuItem>>[];
 
   /// 静态弹幕
-  final _staticDanmakuItems = ListValueNotifier(<DanmakuItem<T>?>[]);
+  final _staticDanmakuItems = ListValueNotifier(<DanmakuItem?>[]);
 
-  /// 高级弹幕
-  final _specialDanmakuItems = <DanmakuItem<T>>[];
+  bool get _isEmpty =>
+      _scrollDanmakuItems.every((list) => list.isEmpty) &&
+      _staticDanmakuItems.value.nonNulls.isEmpty;
 
   /// 弹幕高度
   double _danmakuHeight = 0;
@@ -79,7 +79,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
     _ticker = createTicker(_tick);
     _notifier = ValueNotifier(0);
 
-    widget.createdController(DanmakuController<T>(
+    widget.createdController(DanmakuController(
       addDanmaku: _addDanmaku,
       updateOption: _updateOption,
       pause: _pause,
@@ -87,12 +87,9 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
       clear: _clear,
       getOption: () => _option,
       isRunning: () => _running,
-      findDanmaku: findDanmaku,
-      findSingleDanmaku: findSingleDanmaku,
       getTrackCount: () => _trackCount,
       scrollDanmaku: _scrollDanmakuItems,
       staticDanmaku: _staticDanmakuItems.value,
-      specialDanmaku: _specialDanmakuItems,
     ));
 
     _init(widget.size);
@@ -110,9 +107,6 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
       }
       for (var e in _staticDanmakuItems.value) {
         e?.dispose();
-      }
-      for (var item in _specialDanmakuItems) {
-        item.dispose();
       }
       this.devicePixelRatio = devicePixelRatio;
     }
@@ -148,7 +142,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   }
 
   bool _handleNormalDanmaku(
-    DanmakuContentItem<T> content,
+    DanmakuContentItem content,
     bool Function(int, double) canAdd, {
     bool scroll = false,
   }) {
@@ -173,7 +167,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
       return false;
     }
 
-    DanmakuItem<T> getItem() => DanmakuItem<T>(
+    DanmakuItem getItem() => DanmakuItem(
         xPosition: _viewWidth,
         width: danmakuWidth,
         height: danmakuHeight,
@@ -225,7 +219,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   }
 
   /// 添加弹幕
-  bool _addDanmaku(DanmakuContentItem<T> content) {
+  bool _addDanmaku(DanmakuContentItem content) {
     if (!mounted) {
       return false;
     }
@@ -243,25 +237,6 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
         if (!added && _option.static2Scroll && !_option.hideScroll) {
           added =
               _handleNormalDanmaku(content, _scrollCanAddToTrack, scroll: true);
-        }
-        break;
-      case DanmakuItemType.special:
-        if (_option.hideSpecial) return false;
-        added = true;
-        _specialDanmakuItems.add(
-          DanmakuItem<T>(
-              width: 0,
-              height: 0,
-              content: content,
-              image: DmUtils.recordSpecialDanmakuImg(
-                content: content as SpecialDanmakuContentItem,
-                fontWeight: _option.fontWeight,
-                strokeWidth: _option.strokeWidth,
-                devicePixelRatio: devicePixelRatio,
-              )),
-        );
-        if (_running && !_ticker.isActive) {
-          _ticker.start();
         }
         break;
     }
@@ -282,7 +257,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   void _resume() {
     if (!mounted) return;
     _running = true;
-    if (!_ticker.isActive) {
+    if (!_isEmpty && !_ticker.isActive) {
       _ticker.start();
     }
     _staticDanmakuItems.refresh();
@@ -350,12 +325,6 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                 (clearBottom && e.content.type == DanmakuItemType.bottom),
           ));
     }
-    if (option.hideSpecial && !_option.hideSpecial) {
-      for (var e in _specialDanmakuItems) {
-        e.dispose();
-      }
-      _specialDanmakuItems.clear();
-    }
 
     /// 清理已经存在的 Paragraph 缓存
     if (clearParagraph) {
@@ -367,9 +336,6 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
       }
       for (var e in _staticDanmakuItems.value) {
         e?.dispose();
-      }
-      for (var item in _specialDanmakuItems) {
-        item.dispose();
       }
     }
 
@@ -406,10 +372,6 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
       }
     }
     _staticDanmakuItems.refresh();
-    for (var e in _specialDanmakuItems) {
-      e.dispose();
-    }
-    _specialDanmakuItems.clear();
   }
 
   /// 确定滚动弹幕是否可以添加
@@ -440,20 +402,16 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   void _lazyTick(int tick) {
     // 移除屏幕外滚动弹幕
     for (var i in _scrollDanmakuItems) {
-      i.removeWhereUnsafe((item) => item.needRemove(item.expired));
+      i.removeWhereUnsafe((item) => item.needRemove(item.expired ||
+          (item.drawTick != null &&
+              (tick - item.drawTick!) >= _option.durationInMilliseconds)));
     }
     // 移除静态弹幕
-    _staticDanmakuItems.removeWhere((item) => item.needRemove(!item.suspend &&
+    _staticDanmakuItems.removeWhere((item) => item.needRemove(
         item.drawTick != null &&
-        (tick - item.drawTick!) >= _option.staticDurationInMilliseconds));
-    // 移除高级弹幕
-    _specialDanmakuItems
-        .removeWhereUnsafe((item) => item.needRemove(item.expired));
+            (tick - item.drawTick!) >= _option.staticDurationInMilliseconds));
     // 暂停动画
-    if (_scrollDanmakuItems.isEmpty &&
-        _specialDanmakuItems.isEmpty &&
-        _staticDanmakuItems.value.nonNulls.isEmpty &&
-        _ticker.isActive) {
+    if (_isEmpty && _ticker.isActive) {
       _lastTick = tick;
       _ticker.stop();
     }
@@ -476,7 +434,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   }
 
   @override
-  void didUpdateWidget(DanmakuScreen<T> oldWidget) {
+  void didUpdateWidget(DanmakuScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.size != widget.size) {
       _init(widget.size);
@@ -552,80 +510,9 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
             ),
             1,
           ),
-          RepaintBoundary.wrap(
-            ValueListenableBuilder(
-              valueListenable: _notifier, // 与滚动弹幕共用控制器
-              builder: (context, value, child) {
-                return CustomPaint(
-                  willChange: _running,
-                  painter: SpecialDanmakuPainter(
-                    length: _specialDanmakuItems.length,
-                    danmakuItems: _specialDanmakuItems,
-                    fontSize: _option.fontSize,
-                    fontWeight: _option.fontWeight,
-                    strokeWidth: _option.strokeWidth,
-                    devicePixelRatio: devicePixelRatio,
-                    running: _running,
-                    tick: value,
-                  ),
-                  size: widget.size,
-                );
-              },
-            ),
-            2,
-          ),
         ],
       ),
     );
-  }
-
-  Iterable<(double, DanmakuItem<T>)> findDanmaku(Offset position) sync* {
-    final index = position.dy ~/ _danmakuHeight;
-
-    if (index >= _trackCount) {
-      return;
-    }
-
-    late final trackHeight = index * _danmakuHeight;
-
-    final dx = position.dx;
-    final item = _staticDanmakuItems[index];
-    if (item != null &&
-        item.xPosition <= dx &&
-        dx <= item.xPosition + item.width) {
-      yield (trackHeight, item);
-    }
-
-    for (var i in _scrollDanmakuItems[index].reversed) {
-      if (i.xPosition <= dx && dx <= i.xPosition + i.width) {
-        yield (trackHeight, i);
-      }
-    }
-  }
-
-  (double, DanmakuItem<T>)? findSingleDanmaku(Offset position) {
-    final index = position.dy ~/ _danmakuHeight;
-
-    if (index >= _trackCount) {
-      return null;
-    }
-
-    late final trackHeight = index * _danmakuHeight;
-
-    final dx = position.dx;
-    final item = _staticDanmakuItems[index];
-    if (item != null &&
-        item.xPosition <= dx &&
-        dx <= item.xPosition + item.width) {
-      return (trackHeight, item);
-    }
-
-    for (var i in _scrollDanmakuItems[index].reversed) {
-      if (i.xPosition <= dx && dx <= i.xPosition + i.width) {
-        return (trackHeight, i);
-      }
-    }
-    return null;
   }
 }
 

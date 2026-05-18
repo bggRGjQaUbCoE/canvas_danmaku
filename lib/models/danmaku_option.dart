@@ -29,9 +29,6 @@ class DanmakuOption {
   /// 隐藏滚动弹幕
   final bool hideScroll;
 
-  /// 隐藏高级弹幕
-  final bool hideSpecial;
-
   /// 弹幕描边
   final double strokeWidth;
 
@@ -54,7 +51,6 @@ class DanmakuOption {
         DanmakuItemType.scroll => hideScroll,
         DanmakuItemType.top => hideTop,
         DanmakuItemType.bottom => hideBottom,
-        DanmakuItemType.special => hideSpecial,
       };
 
   const DanmakuOption({
@@ -66,7 +62,6 @@ class DanmakuOption {
     this.hideBottom = false,
     this.hideScroll = false,
     this.hideTop = false,
-    this.hideSpecial = false,
     this.strokeWidth = 1.5,
     this.scrollFixedVelocity = false,
     this.massiveMode = false,
@@ -102,7 +97,6 @@ class DanmakuOption {
       hideTop: hideTop ?? this.hideTop,
       hideBottom: hideBottom ?? this.hideBottom,
       hideScroll: hideScroll ?? this.hideScroll,
-      hideSpecial: hideSpecial ?? this.hideSpecial,
       strokeWidth: strokeWidth ?? this.strokeWidth,
       scrollFixedVelocity: scrollFixedVelocity ?? this.scrollFixedVelocity,
       massiveMode: massiveMode ?? this.massiveMode,

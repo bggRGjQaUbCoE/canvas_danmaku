@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:canvas_danmaku/canvas_danmaku.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:xml/xml.dart';
@@ -36,9 +35,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   static final _random = Random();
 
-  DanmakuController<int>? _controller;
-
-  final _danmuKey = GlobalKey();
+  DanmakuController? _controller;
 
   /// 弹幕行高
   double _lineHeight = 1.6;
@@ -85,43 +82,6 @@ class _HomePageState extends State<HomePage> {
   /// 静态弹幕无法添加时作为滚动弹幕添加
   bool _static2Scroll = false;
 
-  late final dmPadding = EdgeInsets.zero;
-  //  EdgeInsets.fromLTRB(
-  //   _random.nextDouble() * 50 + 10,
-  //   _random.nextDouble() * 50 + 10,
-  //   _random.nextDouble() * 50 + 10,
-  //   _random.nextDouble() * 50 + 10,
-  // );
-
-  double _viewWidth = 0;
-
-  DanmakuItem? _suspendedDM;
-  OverlayEntry? _overlayEntry;
-  void _removeOverlay() {
-    _suspendedDM?.suspend = false;
-    _suspendedDM = null;
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-  }
-
-  static const overlaySpacing = 10.0;
-  static const overlayWidth = 130.0;
-  static const overlayHeight = 35.0;
-
-  Widget _overlayItem(Widget child, {required VoidCallback onTap}) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: SizedBox(
-        height: overlayHeight,
-        width: overlayWidth / 3,
-        child: Center(
-          child: child,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -144,7 +104,6 @@ class _HomePageState extends State<HomePage> {
                         // color: Colors.white,
                         color: getRandomColor(),
                         count: [1, 10, 100, 1000, 10000][_random.nextInt(5)],
-                        extra: _random.nextInt(2147483647),
                       ),
                     );
                   },
@@ -160,7 +119,6 @@ class _HomePageState extends State<HomePage> {
                         // color: Colors.white,
                         type: DanmakuItemType.top,
                         count: [1, 10, 100, 1000, 10000][_random.nextInt(5)],
-                        extra: _random.nextInt(2147483647),
                       ),
                     );
                   },
@@ -176,147 +134,8 @@ class _HomePageState extends State<HomePage> {
                         // color: Colors.white,
                         type: DanmakuItemType.bottom,
                         count: [1, 10, 100, 1000, 10000][_random.nextInt(5)],
-                        extra: _random.nextInt(2147483647),
                       ),
                     );
-                  },
-                ),
-                TextButton(
-                  child: const Text('Special'),
-                  onPressed: () {
-                    _controller?.addDanmaku(randSpecialDanmaku());
-                  },
-                  onLongPress: () {
-                    for (var i = 0; i < 1000; i++) {
-                      _controller?.addDanmaku(randSpecialDanmaku());
-                    }
-                  },
-                ),
-                TextButton(
-                  child: const Text('Circle'),
-                  onPressed: () {
-                    Iterable.generate(
-                      36,
-                      (i) => SpecialDanmakuContentItem(
-                        '测试',
-                        duration: 4000,
-                        color: Colors.red,
-                        fontSize: 64 * 2,
-                        translateXTween: Tween<double>(begin: 0.5, end: 0.5),
-                        translateYTween: Tween<double>(begin: 0.5, end: 0.5),
-                        alphaTween: Tween<double>(begin: 1, end: 0),
-                        rotateZ: i * pi / 18,
-                        easingType: Curves.linear,
-                        hasStroke: true,
-                        extra: _random.nextInt(2147483647),
-                      ),
-                    ).forEach(_controller!.addDanmaku);
-                  },
-                ),
-                TextButton(
-                  child: const Text('Star'),
-                  onPressed: () {
-                    _controller?.addDanmaku(
-                      SpecialDanmakuContentItem.fromList(
-                        getRandomColor(),
-                        44,
-                        [
-                          "0.939",
-                          "0.083",
-                          "1-1",
-                          "6",
-                          "☆——————\n" * 14,
-                          "342",
-                          "0",
-                          "0.002",
-                          "0.271",
-                          500,
-                          0,
-                          1,
-                          "SimHei",
-                          1,
-                        ],
-                        extra: _random.nextInt(2147483647),
-                      ),
-                    );
-                  },
-                ),
-                TextButton(
-                  child: const Text('Big'),
-                  onPressed: () {
-                    final color = getRandomColor();
-                    _controller!.addDanmaku(
-                      SpecialDanmakuContentItem(
-                        '测试',
-                        duration: 4000,
-                        color: color,
-                        fontSize: 128,
-                        translateXTween: ConstantTween(0),
-                        translateYTween: ConstantTween(0),
-                        alphaTween: Tween<double>(begin: 1, end: 0),
-                        easingType: Curves.linear,
-                        hasStroke: true,
-                        extra: _random.nextInt(2147483647),
-                      ),
-                    );
-                    _controller!.addDanmaku(
-                      SpecialDanmakuContentItem(
-                        '测试' * 200,
-                        duration: 4000,
-                        color: color,
-                        fontSize: 128,
-                        translateXTween: ConstantTween(0),
-                        translateYTween: ConstantTween(0),
-                        alphaTween: Tween<double>(begin: 1, end: 0),
-                        easingType: Curves.linear,
-                        hasStroke: true,
-                        extra: _random.nextInt(2147483647),
-                      ),
-                    );
-                    _controller!.addDanmaku(
-                      SpecialDanmakuContentItem(
-                        '测试\n' * 200,
-                        duration: 4000,
-                        color: color,
-                        fontSize: 128,
-                        translateXTween: ConstantTween(0),
-                        translateYTween: ConstantTween(0),
-                        alphaTween: Tween<double>(begin: 1, end: 0),
-                        easingType: Curves.linear,
-                        hasStroke: true,
-                        extra: _random.nextInt(2147483647),
-                      ),
-                    );
-                  },
-                ),
-                TextButton(
-                  child: const Text('DanMu'),
-                  onPressed: () async {
-                    String data = await rootBundle.loadString('assets/dm.json');
-                    final danmaku = jsonDecode(data) as List;
-                    final dan = danmaku.last as List;
-                    final mu = danmaku.first as List;
-                    for (var item in dan) {
-                      _controller?.addDanmaku(
-                        SpecialDanmakuContentItem.fromList(
-                          Colors.orange,
-                          16,
-                          item,
-                          extra: _random.nextInt(2147483647),
-                        ),
-                      );
-                    }
-                    await Future.delayed(const Duration(seconds: 2));
-                    for (var item in mu) {
-                      _controller?.addDanmaku(
-                        SpecialDanmakuContentItem.fromList(
-                          Colors.orange,
-                          16,
-                          item,
-                          extra: _random.nextInt(2147483647),
-                        ),
-                      );
-                    }
                   },
                 ),
                 TextButton(
@@ -334,7 +153,6 @@ class _HomePageState extends State<HomePage> {
                           DanmakuItemType.scroll,
                         ][_random.nextInt(3)],
                         selfSend: true,
-                        extra: _random.nextInt(2147483647),
                       ),
                     );
                   },
@@ -349,7 +167,6 @@ class _HomePageState extends State<HomePage> {
                         // color: Colors.white,
                         // isColorful: true,
                         type: DanmakuItemType.top,
-                        extra: _random.nextInt(2147483647),
                       ),
                     );
                   },
@@ -364,7 +181,6 @@ class _HomePageState extends State<HomePage> {
                         // color: Colors.white,
                         // isColorful: true,
                         type: DanmakuItemType.scroll,
-                        extra: _random.nextInt(2147483647),
                       ),
                     );
                     _controller?.addDanmaku(
@@ -374,7 +190,6 @@ class _HomePageState extends State<HomePage> {
                         // color: Colors.white,
                         // isColorful: true,
                         type: DanmakuItemType.scroll,
-                        extra: _random.nextInt(2147483647),
                       ),
                     );
                   },
@@ -414,7 +229,6 @@ class _HomePageState extends State<HomePage> {
                   icon: const Icon(Icons.clear),
                   onPressed: () {
                     _controller?.clear();
-                    _removeOverlay();
                     _stopTimer();
                   },
                   tooltip: 'Clear',
@@ -423,161 +237,34 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Expanded(
-            child: Padding(
-              padding: dmPadding,
-              child: Listener(
-                onPointerUp: (event) {
-                  // return;
-                  if (_controller == null) return;
-
-                  final items = _controller!
-                      .findDanmaku(event.localPosition)
-                      .toList();
-                  if (items.isNotEmpty) {
-                    for (var (_, i) in items) {
-                      i.suspend = true;
-                    }
-                    debugPrint(items.toString());
-                    Future.delayed(const Duration(seconds: 3), () {
-                      for (var (_, i) in items) {
-                        i.suspend = false;
-                      }
-                    });
-                  }
-
-                  /// single
-                  final res = _controller!.findSingleDanmaku(
-                    event.localPosition,
-                  );
-
-                  if (res == null) {
-                    _removeOverlay();
-                  } else if (res.$2 != _suspendedDM) {
-                    final (yPos, item) = res;
-                    _removeOverlay();
-                    item.suspend = true;
-                    _suspendedDM = item;
-                    print('danmaku id: ${item.content.extra}');
-
-                    final dy = yPos;
-                    final dySpacing =
-                        event.position.dy - event.localPosition.dy;
-                    final dxSpacing =
-                        event.position.dx - event.localPosition.dx;
-                    _overlayEntry = OverlayEntry(
-                      builder: (context) {
-                        return Positioned(
-                          top: dy + item.height + dySpacing,
-                          left: clampDouble(
-                            event.position.dx - overlayWidth / 2,
-                            overlaySpacing + dxSpacing,
-                            _viewWidth -
-                                overlayWidth -
-                                overlaySpacing +
-                                dxSpacing,
-                          ),
-                          child: Column(
-                            children: [
-                              CustomPaint(
-                                painter: TrianglePainter(Colors.black54),
-                                size: const Size(12, 6),
-                              ),
-                              Container(
-                                width: overlayWidth,
-                                height: overlayHeight,
-                                decoration: const BoxDecoration(
-                                  color: Colors.black54,
-                                  borderRadius: BorderRadiusGeometry.all(
-                                    Radius.circular(18),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    _overlayItem(
-                                      const Icon(
-                                        size: 20,
-                                        Icons.thumb_up_off_alt_outlined,
-                                        color: Colors.white,
-                                      ),
-                                      onTap: () {
-                                        _removeOverlay();
-                                        print('on thumb up');
-                                      },
-                                    ),
-                                    _overlayItem(
-                                      const Icon(
-                                        size: 20,
-                                        Icons.copy,
-                                        color: Colors.white,
-                                      ),
-                                      onTap: () {
-                                        Clipboard.setData(
-                                          ClipboardData(
-                                            text: item.content.text,
-                                          ),
-                                        );
-                                        _removeOverlay();
-                                        print('on copy');
-                                      },
-                                    ),
-                                    _overlayItem(
-                                      const Icon(
-                                        size: 20,
-                                        Icons.report_problem_outlined,
-                                        color: Colors.white,
-                                      ),
-                                      onTap: () {
-                                        _removeOverlay();
-                                        print('on report');
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
+            child: ColoredBox(
+              color: Colors.grey,
+              child: AnimatedOpacity(
+                opacity: _opacity,
+                duration: const Duration(milliseconds: 100),
+                child: LayoutBuilder(
+                  builder: (_, constrains) {
+                    return DanmakuScreen(
+                      createdController: (e) {
+                        _controller = e;
                       },
+                      option: DanmakuOption(
+                        fontSize: _fontSize,
+                        fontWeight: _fontWeight,
+                        duration: _duration,
+                        staticDuration: _staticDuration,
+                        strokeWidth: _strokeWidth,
+                        massiveMode: _massiveMode,
+                        static2Scroll: _static2Scroll,
+                        hideScroll: _hideScroll,
+                        hideTop: _hideTop,
+                        hideBottom: _hideBottom,
+                        safeArea: _safeArea,
+                        lineHeight: _lineHeight,
+                      ),
+                      size: constrains.biggest,
                     );
-                    Overlay.of(context).insert(_overlayEntry!);
-                  }
-                },
-                child: ColoredBox(
-                  color: Colors.grey,
-                  child: AnimatedOpacity(
-                    opacity: _opacity,
-                    duration: const Duration(milliseconds: 100),
-                    child: LayoutBuilder(
-                      builder: (_, constrains) {
-                        _viewWidth = constrains.maxWidth;
-                        return DanmakuScreen<int>(
-                          key: _danmuKey,
-                          createdController: (e) {
-                            _controller = e;
-                          },
-                          option: DanmakuOption(
-                            fontSize: _fontSize,
-                            fontWeight: _fontWeight,
-                            duration: _duration,
-                            staticDuration: _staticDuration,
-                            strokeWidth: _strokeWidth,
-                            massiveMode: _massiveMode,
-                            static2Scroll: _static2Scroll,
-                            hideScroll: _hideScroll,
-                            hideTop: _hideTop,
-                            hideBottom: _hideBottom,
-                            safeArea: _safeArea,
-                            lineHeight: _lineHeight,
-                          ),
-                          size: constrains.biggest,
-                        );
-                      },
-                    ),
-                  ),
+                  },
                 ),
               ),
             ),
@@ -953,25 +640,13 @@ class _HomePageState extends State<HomePage> {
         final parts = pAttr.split(',');
         final type = _parseType(parts[1]);
         final color = _parseColor(parts[3]);
-        if (type == DanmakuItemType.special) {
-          try {
-            _controller!.addDanmaku(
-              SpecialDanmakuContentItem.fromList(
-                color,
-                double.parse(parts[2]),
-                jsonDecode(content.replaceAll('\n', '\\n')),
-              ),
-            );
-          } catch (_) {}
-        } else {
-          _controller?.addDanmaku(
-            DanmakuContentItem(
-              content,
-              type: type,
-              color: color,
-            ),
-          );
-        }
+        _controller?.addDanmaku(
+          DanmakuContentItem(
+            content,
+            type: type,
+            color: color,
+          ),
+        );
       }
       index++;
     });
@@ -982,14 +657,13 @@ class _HomePageState extends State<HomePage> {
   DanmakuItemType _parseType(String type) => switch (type) {
     '4' => DanmakuItemType.bottom,
     '5' => DanmakuItemType.top,
-    '7' => DanmakuItemType.special,
     _ => DanmakuItemType.scroll,
   };
 
   Future<void> startPlay() async {
     _stopTimer();
     String data = await rootBundle.loadString('assets/132590001.json');
-    List<DanmakuContentItem<int>> items = [];
+    List<DanmakuContentItem> items = [];
     Map jsonMap = json.decode(data);
     for (Map item in jsonMap['comments']) {
       final parts = (item['p'] as String).split(',');
@@ -1016,40 +690,6 @@ class _HomePageState extends State<HomePage> {
   // 生成随机颜色
   static Color getRandomColor() {
     return Color(0xFF000000 | _random.nextInt(0x1000000));
-  }
-
-  static SpecialDanmakuContentItem<int> randSpecialDanmaku() {
-    final translationStartDelay = _random.nextInt(1000);
-    final translationDuration = _random.nextInt(14000);
-    final duration =
-        translationStartDelay + translationDuration + _random.nextInt(1000);
-    return SpecialDanmakuContentItem(
-      '这是一条特殊弹幕',
-      color: getRandomColor(),
-      fontSize: _random.nextInt(50) + 25,
-      translateXTween: Tween<double>(
-        begin: _random.nextDouble(),
-        end: _random.nextDouble(),
-      ),
-      translateYTween: Tween<double>(
-        begin: _random.nextDouble(),
-        end: _random.nextDouble(),
-      ),
-      alphaTween: Tween<double>(
-        begin: _random.nextDouble(),
-        end: _random.nextDouble(),
-      ),
-      // rotateZ: _random.nextDouble() * pi,
-      matrix: Matrix4.identity()
-        ..rotateY(_random.nextDouble() * pi)
-        ..rotateZ(_random.nextDouble() * pi),
-      duration: duration,
-      translationDuration: translationDuration,
-      translationStartDelay: translationStartDelay,
-      easingType: const [Curves.linear, Curves.easeInCubic][_random.nextInt(2)],
-      hasStroke: _random.nextBool(),
-      extra: _random.nextInt(2147483647),
-    );
   }
 
   @override
