@@ -85,14 +85,6 @@ class _HomePageState extends State<HomePage> {
   /// 静态弹幕无法添加时作为滚动弹幕添加
   bool _static2Scroll = false;
 
-  late final dmPadding = EdgeInsets.zero;
-  //  EdgeInsets.fromLTRB(
-  //   _random.nextDouble() * 50 + 10,
-  //   _random.nextDouble() * 50 + 10,
-  //   _random.nextDouble() * 50 + 10,
-  //   _random.nextDouble() * 50 + 10,
-  // );
-
   double _viewWidth = 0;
 
   DanmakuItem? _suspendedDM;
@@ -423,502 +415,526 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Expanded(
-            child: Padding(
-              padding: dmPadding,
-              child: Listener(
-                onPointerUp: (event) {
-                  // return;
-                  if (_controller == null) return;
+            child: Row(
+              children: [
+                Expanded(
+                  child: Listener(
+                    onPointerUp: (event) {
+                      // return;
+                      if (_controller == null) return;
 
-                  final items = _controller!
-                      .findDanmaku(event.localPosition)
-                      .toList();
-                  if (items.isNotEmpty) {
-                    for (var (_, i) in items) {
-                      i.suspend = true;
-                    }
-                    debugPrint(items.toString());
-                    Future.delayed(const Duration(seconds: 3), () {
-                      for (var (_, i) in items) {
-                        i.suspend = false;
+                      final items = _controller!
+                          .findDanmaku(event.localPosition)
+                          .toList();
+                      if (items.isNotEmpty) {
+                        for (var (_, i) in items) {
+                          i.suspend = true;
+                        }
+                        debugPrint(items.toString());
+                        Future.delayed(const Duration(seconds: 3), () {
+                          for (var (_, i) in items) {
+                            i.suspend = false;
+                          }
+                        });
                       }
-                    });
-                  }
 
-                  /// single
-                  final res = _controller!.findSingleDanmaku(
-                    event.localPosition,
-                  );
+                      /// single
+                      final res = _controller!.findSingleDanmaku(
+                        event.localPosition,
+                      );
 
-                  if (res == null) {
-                    _removeOverlay();
-                  } else if (res.$2 != _suspendedDM) {
-                    final (yPos, item) = res;
-                    _removeOverlay();
-                    item.suspend = true;
-                    _suspendedDM = item;
-                    print('danmaku id: ${item.content.extra}');
+                      if (res == null) {
+                        _removeOverlay();
+                      } else if (res.$2 != _suspendedDM) {
+                        final (yPos, item) = res;
+                        _removeOverlay();
+                        item.suspend = true;
+                        _suspendedDM = item;
+                        print('danmaku id: ${item.content.extra}');
 
-                    final dy = yPos;
-                    final dySpacing =
-                        event.position.dy - event.localPosition.dy;
-                    final dxSpacing =
-                        event.position.dx - event.localPosition.dx;
-                    _overlayEntry = OverlayEntry(
-                      builder: (context) {
-                        return Positioned(
-                          top: dy + item.height + dySpacing,
-                          left: clampDouble(
-                            event.position.dx - overlayWidth / 2,
-                            overlaySpacing + dxSpacing,
-                            _viewWidth -
-                                overlayWidth -
-                                overlaySpacing +
-                                dxSpacing,
-                          ),
-                          child: Column(
-                            children: [
-                              CustomPaint(
-                                painter: TrianglePainter(Colors.black54),
-                                size: const Size(12, 6),
+                        final dy = yPos;
+                        final dySpacing =
+                            event.position.dy - event.localPosition.dy;
+                        final dxSpacing =
+                            event.position.dx - event.localPosition.dx;
+                        _overlayEntry = OverlayEntry(
+                          builder: (context) {
+                            return Positioned(
+                              top: dy + item.height + dySpacing,
+                              left: clampDouble(
+                                event.position.dx - overlayWidth / 2,
+                                overlaySpacing + dxSpacing,
+                                _viewWidth -
+                                    overlayWidth -
+                                    overlaySpacing +
+                                    dxSpacing,
                               ),
-                              Container(
-                                width: overlayWidth,
-                                height: overlayHeight,
-                                decoration: const BoxDecoration(
-                                  color: Colors.black54,
-                                  borderRadius: BorderRadiusGeometry.all(
-                                    Radius.circular(18),
+                              child: Column(
+                                children: [
+                                  CustomPaint(
+                                    painter: TrianglePainter(Colors.black54),
+                                    size: const Size(12, 6),
                                   ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    _overlayItem(
-                                      const Icon(
-                                        size: 20,
-                                        Icons.thumb_up_off_alt_outlined,
-                                        color: Colors.white,
+                                  Container(
+                                    width: overlayWidth,
+                                    height: overlayHeight,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.black54,
+                                      borderRadius: BorderRadiusGeometry.all(
+                                        Radius.circular(18),
                                       ),
-                                      onTap: () {
-                                        _removeOverlay();
-                                        print('on thumb up');
-                                      },
                                     ),
-                                    _overlayItem(
-                                      const Icon(
-                                        size: 20,
-                                        Icons.copy,
-                                        color: Colors.white,
-                                      ),
-                                      onTap: () {
-                                        Clipboard.setData(
-                                          ClipboardData(
-                                            text: item.content.text,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        _overlayItem(
+                                          const Icon(
+                                            size: 20,
+                                            Icons.thumb_up_off_alt_outlined,
+                                            color: Colors.white,
                                           ),
-                                        );
-                                        _removeOverlay();
-                                        print('on copy');
-                                      },
+                                          onTap: () {
+                                            _removeOverlay();
+                                            print('on thumb up');
+                                          },
+                                        ),
+                                        _overlayItem(
+                                          const Icon(
+                                            size: 20,
+                                            Icons.copy,
+                                            color: Colors.white,
+                                          ),
+                                          onTap: () {
+                                            Clipboard.setData(
+                                              ClipboardData(
+                                                text: item.content.text,
+                                              ),
+                                            );
+                                            _removeOverlay();
+                                            print('on copy');
+                                          },
+                                        ),
+                                        _overlayItem(
+                                          const Icon(
+                                            size: 20,
+                                            Icons.report_problem_outlined,
+                                            color: Colors.white,
+                                          ),
+                                          onTap: () {
+                                            _removeOverlay();
+                                            print('on report');
+                                          },
+                                        ),
+                                      ],
                                     ),
-                                    _overlayItem(
-                                      const Icon(
-                                        size: 20,
-                                        Icons.report_problem_outlined,
-                                        color: Colors.white,
-                                      ),
-                                      onTap: () {
-                                        _removeOverlay();
-                                        print('on report');
-                                      },
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                    Overlay.of(context).insert(_overlayEntry!);
-                  }
-                },
-                child: ColoredBox(
-                  color: Colors.grey,
-                  child: AnimatedOpacity(
-                    opacity: _opacity,
-                    duration: const Duration(milliseconds: 100),
-                    child: LayoutBuilder(
-                      builder: (_, constrains) {
-                        _viewWidth = constrains.maxWidth;
-                        return DanmakuScreen<int>(
-                          key: _danmuKey,
-                          createdController: (e) {
-                            _controller = e;
+                            );
                           },
-                          option: DanmakuOption(
-                            fontSize: _fontSize,
-                            fontWeight: _fontWeight,
-                            duration: _duration,
-                            staticDuration: _staticDuration,
-                            strokeWidth: _strokeWidth,
-                            massiveMode: _massiveMode,
-                            static2Scroll: _static2Scroll,
-                            hideScroll: _hideScroll,
-                            hideTop: _hideTop,
-                            hideBottom: _hideBottom,
-                            safeArea: _safeArea,
-                            lineHeight: _lineHeight,
-                          ),
-                          size: constrains.biggest,
                         );
-                      },
+                        Overlay.of(context).insert(_overlayEntry!);
+                      }
+                    },
+                    child: ColoredBox(
+                      color: Colors.grey,
+                      child: AnimatedOpacity(
+                        opacity: _opacity,
+                        duration: const Duration(milliseconds: 100),
+                        child: LayoutBuilder(
+                          builder: (_, constrains) {
+                            _viewWidth = constrains.maxWidth;
+                            return ClipRect(
+                              child: DanmakuScreen<int>(
+                                key: _danmuKey,
+                                createdController: (e) {
+                                  _controller = e;
+                                },
+                                option: DanmakuOption(
+                                  fontSize: _fontSize,
+                                  fontWeight: _fontWeight,
+                                  duration: _duration,
+                                  staticDuration: _staticDuration,
+                                  strokeWidth: _strokeWidth,
+                                  massiveMode: _massiveMode,
+                                  static2Scroll: _static2Scroll,
+                                  hideScroll: _hideScroll,
+                                  hideTop: _hideTop,
+                                  hideBottom: _hideBottom,
+                                  safeArea: _safeArea,
+                                  lineHeight: _lineHeight,
+                                ),
+                                size: constrains.biggest,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+                SafeArea(
+                  child: SizedBox(
+                    width: 300,
+                    child: ListView(
+                      padding: const EdgeInsets.all(8),
+                      children: [
+                        Builder(
+                          builder: (context) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text("Line Height : $_lineHeight"),
+                                Slider(
+                                  value: _lineHeight,
+                                  min: 1.0,
+                                  max: 3.0,
+                                  onChanged: (e) {
+                                    if (_controller != null) {
+                                      _lineHeight = double.parse(
+                                        e.toStringAsFixed(1),
+                                      );
+                                      _controller!.updateOption(
+                                        _controller!.option.copyWith(
+                                          lineHeight: _lineHeight,
+                                        ),
+                                      );
+                                      (context as Element).markNeedsBuild();
+                                    }
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Stroke Width : $_strokeWidth"),
+                                Slider(
+                                  value: _strokeWidth,
+                                  min: 0,
+                                  max: 10,
+                                  divisions: 20,
+                                  onChanged: (e) {
+                                    if (_controller != null) {
+                                      _strokeWidth = e;
+                                      _controller!.updateOption(
+                                        _controller!.option.copyWith(
+                                          strokeWidth: _strokeWidth,
+                                        ),
+                                      );
+                                      (context as Element).markNeedsBuild();
+                                    }
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Font Weight : $_fontWeight"),
+                                Slider(
+                                  value: _fontWeight.toDouble(),
+                                  min: 0,
+                                  max: 8,
+                                  divisions: 8,
+                                  onChanged: (e) {
+                                    if (_controller != null) {
+                                      _fontWeight = e.toInt();
+                                      _controller!.updateOption(
+                                        _controller!.option.copyWith(
+                                          fontWeight: _fontWeight,
+                                        ),
+                                      );
+                                    }
+                                    (context as Element).markNeedsBuild();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        Text("Opacity : $_opacity"),
+                        Slider(
+                          value: _opacity,
+                          min: 0.0,
+                          max: 1.0,
+                          divisions: 10,
+                          onChanged: (e) {
+                            _opacity = double.parse(e.toStringAsFixed(1));
+                            setState(() {});
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Font Size : $_fontSize"),
+                                Slider(
+                                  value: _fontSize,
+                                  min: 8,
+                                  max: 100,
+                                  onChanged: (e) {
+                                    if (_controller != null) {
+                                      _fontSize = e.round().toDouble();
+                                      _controller!.updateOption(
+                                        _controller!.option.copyWith(
+                                          fontSize: _fontSize,
+                                        ),
+                                      );
+                                      (context as Element).markNeedsBuild();
+                                    }
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Area : $_area"),
+                                Slider(
+                                  value: _area,
+                                  min: 0.1,
+                                  max: 1.0,
+                                  divisions: 9,
+                                  onChanged: (e) {
+                                    if (_controller != null) {
+                                      _area = e.toPrecision(1);
+                                      _controller!.updateOption(
+                                        _controller!.option.copyWith(
+                                          area: _area,
+                                        ),
+                                      );
+                                      (context as Element).markNeedsBuild();
+                                    }
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Scroll Duration : $_duration"),
+                                Slider(
+                                  value: _duration.toDouble(),
+                                  min: 4,
+                                  max: 20,
+                                  divisions: 16,
+                                  onChanged: (e) {
+                                    if (_controller != null) {
+                                      _duration = e;
+                                      _controller!.updateOption(
+                                        _controller!.option.copyWith(
+                                          duration: _duration,
+                                        ),
+                                      );
+                                      (context as Element).markNeedsBuild();
+                                    }
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Static Duration : $_staticDuration"),
+                                Slider(
+                                  value: _staticDuration.toDouble(),
+                                  min: 1,
+                                  max: 20,
+                                  divisions: 19,
+                                  onChanged: (e) {
+                                    if (_controller != null) {
+                                      _staticDuration = e;
+                                      _controller!.updateOption(
+                                        _controller!.option.copyWith(
+                                          staticDuration: _staticDuration,
+                                        ),
+                                      );
+                                      (context as Element).markNeedsBuild();
+                                    }
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return SwitchListTile(
+                              title: const Text('scrollFixedVelocity'),
+                              value:
+                                  _controller?.option.scrollFixedVelocity ??
+                                  false,
+                              onChanged: (e) {
+                                if (_controller != null) {
+                                  _controller!.updateOption(
+                                    _controller!.option.copyWith(
+                                      scrollFixedVelocity: e,
+                                    ),
+                                  );
+                                  (context as Element).markNeedsBuild();
+                                }
+                              },
+                            );
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return SwitchListTile(
+                              title: const Text('MassiveMode'),
+                              value: _massiveMode,
+                              onChanged: (e) {
+                                if (_controller != null) {
+                                  _massiveMode = e;
+                                  _controller!.updateOption(
+                                    _controller!.option.copyWith(
+                                      massiveMode: e,
+                                    ),
+                                  );
+                                  (context as Element).markNeedsBuild();
+                                }
+                              },
+                            );
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return SwitchListTile(
+                              title: const Text('Static2Scroll'),
+                              value: _static2Scroll,
+                              onChanged: (e) {
+                                if (_controller != null) {
+                                  _static2Scroll = e;
+                                  _controller!.updateOption(
+                                    _controller!.option.copyWith(
+                                      static2Scroll: e,
+                                    ),
+                                  );
+                                  (context as Element).markNeedsBuild();
+                                }
+                              },
+                            );
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return SwitchListTile(
+                              title: const Text('SafeArea'),
+                              value: _safeArea,
+                              onChanged: (e) {
+                                if (_controller != null) {
+                                  _safeArea = e;
+                                  _controller!.updateOption(
+                                    _controller!.option.copyWith(safeArea: e),
+                                  );
+                                  (context as Element).markNeedsBuild();
+                                }
+                              },
+                            );
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return SwitchListTile(
+                              title: const Text('hide scroll'),
+                              value: _hideScroll,
+                              onChanged: (e) {
+                                if (_controller != null) {
+                                  _hideScroll = e;
+                                  _controller!.updateOption(
+                                    _controller!.option.copyWith(hideScroll: e),
+                                  );
+                                  (context as Element).markNeedsBuild();
+                                }
+                              },
+                            );
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return SwitchListTile(
+                              title: const Text('hide top'),
+                              value: _hideTop,
+                              onChanged: (e) {
+                                if (_controller != null) {
+                                  _hideTop = e;
+                                  _controller!.updateOption(
+                                    _controller!.option.copyWith(hideTop: e),
+                                  );
+                                  (context as Element).markNeedsBuild();
+                                }
+                              },
+                            );
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return SwitchListTile(
+                              title: const Text('hide bottom'),
+                              value: _hideBottom,
+                              onChanged: (e) {
+                                if (_controller != null) {
+                                  _hideBottom = e;
+                                  _controller!.updateOption(
+                                    _controller!.option.copyWith(hideBottom: e),
+                                  );
+                                  (context as Element).markNeedsBuild();
+                                }
+                              },
+                            );
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return SwitchListTile(
+                              title: const Text('hide special'),
+                              value: _hideSpecial,
+                              onChanged: (e) {
+                                if (_controller != null) {
+                                  _hideSpecial = e;
+                                  _controller!.updateOption(
+                                    _controller!.option.copyWith(
+                                      hideSpecial: e,
+                                    ),
+                                  );
+                                  (context as Element).markNeedsBuild();
+                                }
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
-      ),
-      endDrawer: Drawer(
-        child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.all(8),
-            children: [
-              Builder(
-                builder: (context) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text("Line Height : $_lineHeight"),
-                      Slider(
-                        value: _lineHeight,
-                        min: 1.0,
-                        max: 3.0,
-                        onChanged: (e) {
-                          if (_controller != null) {
-                            _lineHeight = double.parse(e.toStringAsFixed(1));
-                            _controller!.updateOption(
-                              _controller!.option.copyWith(
-                                lineHeight: _lineHeight,
-                              ),
-                            );
-                            (context as Element).markNeedsBuild();
-                          }
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Stroke Width : $_strokeWidth"),
-                      Slider(
-                        value: _strokeWidth,
-                        min: 0,
-                        max: 10,
-                        divisions: 20,
-                        onChanged: (e) {
-                          if (_controller != null) {
-                            _strokeWidth = e;
-                            _controller!.updateOption(
-                              _controller!.option.copyWith(
-                                strokeWidth: _strokeWidth,
-                              ),
-                            );
-                            (context as Element).markNeedsBuild();
-                          }
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Font Weight : $_fontWeight"),
-                      Slider(
-                        value: _fontWeight.toDouble(),
-                        min: 0,
-                        max: 8,
-                        divisions: 8,
-                        onChanged: (e) {
-                          if (_controller != null) {
-                            _fontWeight = e.toInt();
-                            _controller!.updateOption(
-                              _controller!.option.copyWith(
-                                fontWeight: _fontWeight,
-                              ),
-                            );
-                          }
-                          (context as Element).markNeedsBuild();
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-              Text("Opacity : $_opacity"),
-              Slider(
-                value: _opacity,
-                min: 0.1,
-                max: 1.0,
-                divisions: 9,
-                onChanged: (e) {
-                  _opacity = double.parse(e.toStringAsFixed(1));
-                  setState(() {});
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Font Size : $_fontSize"),
-                      Slider(
-                        value: _fontSize,
-                        min: 8,
-                        max: 100,
-                        onChanged: (e) {
-                          if (_controller != null) {
-                            _fontSize = e.round().toDouble();
-                            _controller!.updateOption(
-                              _controller!.option.copyWith(fontSize: _fontSize),
-                            );
-                            (context as Element).markNeedsBuild();
-                          }
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Area : $_area"),
-                      Slider(
-                        value: _area,
-                        min: 0.1,
-                        max: 1.0,
-                        divisions: 9,
-                        onChanged: (e) {
-                          if (_controller != null) {
-                            _area = e.toPrecision(1);
-                            _controller!.updateOption(
-                              _controller!.option.copyWith(area: _area),
-                            );
-                            (context as Element).markNeedsBuild();
-                          }
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Scroll Duration : $_duration"),
-                      Slider(
-                        value: _duration.toDouble(),
-                        min: 4,
-                        max: 20,
-                        divisions: 16,
-                        onChanged: (e) {
-                          if (_controller != null) {
-                            _duration = e;
-                            _controller!.updateOption(
-                              _controller!.option.copyWith(duration: _duration),
-                            );
-                            (context as Element).markNeedsBuild();
-                          }
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Static Duration : $_staticDuration"),
-                      Slider(
-                        value: _staticDuration.toDouble(),
-                        min: 1,
-                        max: 20,
-                        divisions: 19,
-                        onChanged: (e) {
-                          if (_controller != null) {
-                            _staticDuration = e;
-                            _controller!.updateOption(
-                              _controller!.option.copyWith(
-                                staticDuration: _staticDuration,
-                              ),
-                            );
-                            (context as Element).markNeedsBuild();
-                          }
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return SwitchListTile(
-                    title: const Text('scrollFixedVelocity'),
-                    value: _controller!.option.scrollFixedVelocity,
-                    onChanged: (e) {
-                      if (_controller != null) {
-                        _controller!.updateOption(
-                          _controller!.option.copyWith(scrollFixedVelocity: e),
-                        );
-                        (context as Element).markNeedsBuild();
-                      }
-                    },
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return SwitchListTile(
-                    title: const Text('MassiveMode'),
-                    value: _massiveMode,
-                    onChanged: (e) {
-                      if (_controller != null) {
-                        _massiveMode = e;
-                        _controller!.updateOption(
-                          _controller!.option.copyWith(massiveMode: e),
-                        );
-                        (context as Element).markNeedsBuild();
-                      }
-                    },
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return SwitchListTile(
-                    title: const Text('Static2Scroll'),
-                    value: _static2Scroll,
-                    onChanged: (e) {
-                      if (_controller != null) {
-                        _static2Scroll = e;
-                        _controller!.updateOption(
-                          _controller!.option.copyWith(static2Scroll: e),
-                        );
-                        (context as Element).markNeedsBuild();
-                      }
-                    },
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return SwitchListTile(
-                    title: const Text('SafeArea'),
-                    value: _safeArea,
-                    onChanged: (e) {
-                      if (_controller != null) {
-                        _safeArea = e;
-                        _controller!.updateOption(
-                          _controller!.option.copyWith(safeArea: e),
-                        );
-                        (context as Element).markNeedsBuild();
-                      }
-                    },
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return SwitchListTile(
-                    title: const Text('hide scroll'),
-                    value: _hideScroll,
-                    onChanged: (e) {
-                      if (_controller != null) {
-                        _hideScroll = e;
-                        _controller!.updateOption(
-                          _controller!.option.copyWith(hideScroll: e),
-                        );
-                        (context as Element).markNeedsBuild();
-                      }
-                    },
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return SwitchListTile(
-                    title: const Text('hide top'),
-                    value: _hideTop,
-                    onChanged: (e) {
-                      if (_controller != null) {
-                        _hideTop = e;
-                        _controller!.updateOption(
-                          _controller!.option.copyWith(hideTop: e),
-                        );
-                        (context as Element).markNeedsBuild();
-                      }
-                    },
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return SwitchListTile(
-                    title: const Text('hide bottom'),
-                    value: _hideBottom,
-                    onChanged: (e) {
-                      if (_controller != null) {
-                        _hideBottom = e;
-                        _controller!.updateOption(
-                          _controller!.option.copyWith(hideBottom: e),
-                        );
-                        (context as Element).markNeedsBuild();
-                      }
-                    },
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return SwitchListTile(
-                    title: const Text('hide special'),
-                    value: _hideSpecial,
-                    onChanged: (e) {
-                      if (_controller != null) {
-                        _hideSpecial = e;
-                        _controller!.updateOption(
-                          _controller!.option.copyWith(hideSpecial: e),
-                        );
-                        (context as Element).markNeedsBuild();
-                      }
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
