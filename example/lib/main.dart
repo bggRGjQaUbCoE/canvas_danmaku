@@ -9,20 +9,12 @@ import 'package:flutter/services.dart';
 import 'package:xml/xml.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
+  runApp(
+    const MaterialApp(
       title: 'CanvasDanmaku Demo',
       home: HomePage(),
-    );
-  }
+    ),
+  );
 }
 
 class HomePage extends StatefulWidget {
