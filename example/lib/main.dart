@@ -10,20 +10,12 @@ import 'package:flutter/services.dart';
 import 'package:xml/xml.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
+  runApp(
+    const MaterialApp(
       title: 'CanvasDanmaku Demo',
       home: HomePage(),
-    );
-  }
+    ),
+  );
 }
 
 class HomePage extends StatefulWidget {
@@ -37,8 +29,6 @@ class _HomePageState extends State<HomePage> {
   static final _random = Random();
 
   DanmakuController<int>? _controller;
-
-  final _danmuKey = GlobalKey();
 
   /// 弹幕行高
   double _lineHeight = 1.6;
@@ -549,7 +539,6 @@ class _HomePageState extends State<HomePage> {
                             _viewWidth = constrains.maxWidth;
                             return ClipRect(
                               child: DanmakuScreen<int>(
-                                key: _danmuKey,
                                 createdController: (e) {
                                   _controller = e;
                                 },
