@@ -77,14 +77,18 @@ final class ScrollDanmakuPainter extends BaseDanmakuPainter {
       final startPosition = size.width;
       final endPosition = -item.width;
 
-      if (durationInMilliseconds.isNegative) {
-        item.xPosition +=
-            (tick - (item.drawTick ??= tick)) * durationInMilliseconds;
+      if (item.drawTick == null) {
+        item
+          ..drawTick = tick
+          ..xPosition = startPosition;
       } else {
-        final distance = startPosition - endPosition;
-        item.xPosition +=
-            (((item.drawTick ??= tick) - tick) / durationInMilliseconds) *
-                distance;
+        if (durationInMilliseconds.isNegative) {
+          item.xPosition += (tick - item.drawTick!) * durationInMilliseconds;
+        } else {
+          final distance = startPosition - endPosition;
+          item.xPosition +=
+              ((item.drawTick! - tick) / durationInMilliseconds) * distance;
+        }
       }
 
       if (item.xPosition < endPosition || item.xPosition > startPosition) {
