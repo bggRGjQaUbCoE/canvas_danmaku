@@ -5,6 +5,7 @@ abstract base class BaseDanmakuPainter extends CustomPainter {
   final int length;
   final double fontSize;
   final int fontWeight;
+  final String? fontFamily;
   final double strokeWidth;
   final bool running;
   final int batchThreshold;
@@ -16,6 +17,7 @@ abstract base class BaseDanmakuPainter extends CustomPainter {
     required this.length,
     required this.fontSize,
     required this.fontWeight,
+    required this.fontFamily,
     required this.strokeWidth,
     required this.running,
     required this.tick,
@@ -45,6 +47,7 @@ abstract base class BaseDanmakuPainter extends CustomPainter {
         oldDelegate.length != length ||
         oldDelegate.fontSize != fontSize ||
         oldDelegate.fontWeight != fontWeight ||
+        oldDelegate.fontFamily != fontFamily ||
         oldDelegate.strokeWidth != strokeWidth;
   }
 }

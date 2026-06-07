@@ -13,6 +13,7 @@ final class SpecialDanmakuPainter extends BaseDanmakuPainter {
   SpecialDanmakuPainter({
     required super.length,
     required this.danmakuItems,
+    required super.fontFamily,
     required super.fontSize,
     required super.fontWeight,
     required super.strokeWidth,
@@ -69,6 +70,7 @@ final class SpecialDanmakuPainter extends BaseDanmakuPainter {
         content: item,
         fontWeight: fontWeight,
         strokeWidth: strokeWidth,
+        fontFamily: fontFamily,
       ),
       dx,
       dy,
