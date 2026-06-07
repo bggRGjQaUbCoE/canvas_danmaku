@@ -57,6 +57,9 @@ class _HomePageState extends State<HomePage> {
   /// 弹幕粗细
   int _fontWeight = 4;
 
+  /// 弹幕字体
+  String? _fontFamily;
+
   /// 隐藏滚动弹幕
   bool _hideScroll = false;
 
@@ -545,6 +548,7 @@ class _HomePageState extends State<HomePage> {
                                 option: DanmakuOption(
                                   fontSize: _fontSize,
                                   fontWeight: _fontWeight,
+                                  fontFamily: _fontFamily,
                                   duration: _duration,
                                   staticDuration: _staticDuration,
                                   strokeWidth: _strokeWidth,
@@ -647,6 +651,37 @@ class _HomePageState extends State<HomePage> {
                                       );
                                     }
                                     (context as Element).markNeedsBuild();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        Builder(
+                          builder: (context) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Font Family : ${_fontFamily ?? "sans"}",
+                                ),
+                                TextFormField(
+                                  initialValue: _fontFamily,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Enter fontFamily name',
+                                  ),
+                                  onFieldSubmitted: (value) {
+                                    if (_controller != null) {
+                                      _fontFamily = value.isEmpty
+                                          ? null
+                                          : value;
+                                      _controller!.updateOption(
+                                        _controller!.option.copyWith(
+                                          fontFamily: _fontFamily,
+                                        ),
+                                      );
+                                      (context as Element).markNeedsBuild();
+                                    }
                                   },
                                 ),
                               ],

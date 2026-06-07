@@ -7,6 +7,9 @@ class DanmakuOption {
   /// 字体粗细
   final int fontWeight;
 
+  /// 字体名称
+  final String? fontFamily;
+
   /// 显示区域，0.1-1.0
   final double area;
 
@@ -60,6 +63,7 @@ class DanmakuOption {
   const DanmakuOption({
     this.fontSize = 16,
     this.fontWeight = 4,
+    this.fontFamily,
     this.area = 1.0,
     this.duration = 10,
     this.staticDuration = 5,
@@ -79,6 +83,7 @@ class DanmakuOption {
   DanmakuOption copyWith({
     double? fontSize,
     int? fontWeight,
+    String? fontFamily,
     double? area,
     double? duration,
     double? staticDuration,
@@ -97,6 +102,7 @@ class DanmakuOption {
       area: area ?? this.area,
       fontSize: fontSize ?? this.fontSize,
       fontWeight: fontWeight ?? this.fontWeight,
+      fontFamily: fontFamily ?? this.fontFamily,
       duration: duration ?? this.duration,
       staticDuration: staticDuration ?? this.staticDuration,
       hideTop: hideTop ?? this.hideTop,

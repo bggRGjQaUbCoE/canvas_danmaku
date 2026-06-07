@@ -9,6 +9,7 @@ final class StaticDanmakuPainter extends CustomPainter {
   final double staticDurationInMilliseconds;
   final double fontSize;
   final int fontWeight;
+  final String? fontFamily;
   final double strokeWidth;
   final int tick;
 
@@ -19,6 +20,7 @@ final class StaticDanmakuPainter extends CustomPainter {
     required this.staticDurationInMilliseconds,
     required this.fontSize,
     required this.fontWeight,
+    required this.fontFamily,
     required this.strokeWidth,
     required this.tick,
   });
@@ -34,6 +36,7 @@ final class StaticDanmakuPainter extends CustomPainter {
             fontSize,
             fontWeight,
             strokeWidth,
+            fontFamily,
           )
           ..xPosition = (size.width - item.width) / 2;
 
@@ -52,5 +55,6 @@ final class StaticDanmakuPainter extends CustomPainter {
       oldDelegate.count != count ||
       oldDelegate.fontSize != fontSize ||
       oldDelegate.fontWeight != fontWeight ||
+      oldDelegate.fontFamily != fontFamily ||
       oldDelegate.strokeWidth != strokeWidth;
 }

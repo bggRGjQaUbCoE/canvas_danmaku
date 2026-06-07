@@ -139,6 +139,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
           style: TextStyle(
             fontSize: _option.fontSize,
             height: _option.lineHeight,
+            fontFamily: _option.fontFamily,
           ),
         ),
         textDirection: TextDirection.ltr,
@@ -164,6 +165,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
       content: content,
       fontSize: _option.fontSize,
       fontWeight: _option.fontWeight,
+      fontFamily: _option.fontFamily,
     );
 
     final danmakuWidth = (content.selfSend
@@ -190,6 +192,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
           fontSize: _option.fontSize,
           fontWeight: _option.fontWeight,
           strokeWidth: _option.strokeWidth,
+          fontFamily: _option.fontFamily,
         ));
 
     for (var i = 0; i < _trackCount; i++) {
@@ -262,6 +265,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                 content: content as SpecialDanmakuContentItem,
                 fontWeight: _option.fontWeight,
                 strokeWidth: _option.strokeWidth,
+                fontFamily: _option.fontFamily,
               )),
         );
         if (_running && !_ticker.isActive) {
@@ -323,10 +327,12 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
     }
 
     final fontSizeChanged = option.fontSize != _option.fontSize;
+    final fontFamilyChanged = option.fontFamily != _option.fontFamily;
 
     final clearScroll = option.hideScroll && !_option.hideScroll;
 
     final clearParagraph = fontSizeChanged ||
+        fontFamilyChanged ||
         option.fontWeight != _option.fontWeight ||
         option.strokeWidth != _option.strokeWidth;
 
@@ -525,6 +531,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                     trackHeight: _danmakuHeight,
                     danmakuItems: _scrollDanmakuItems,
                     durationInMilliseconds: _scrollVelocityOrDuration,
+                    fontFamily: _option.fontFamily,
                     fontSize: _option.fontSize,
                     fontWeight: _option.fontWeight,
                     strokeWidth: _option.strokeWidth,
@@ -550,6 +557,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                         _option.staticDurationInMilliseconds,
                     fontSize: _option.fontSize,
                     fontWeight: _option.fontWeight,
+                    fontFamily: _option.fontFamily,
                     strokeWidth: _option.strokeWidth,
                     tick: _notifier.value,
                   ),
@@ -568,6 +576,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                   painter: SpecialDanmakuPainter(
                     length: _specialDanmakuItems.length,
                     danmakuItems: _specialDanmakuItems,
+                    fontFamily: _option.fontFamily,
                     fontSize: _option.fontSize,
                     fontWeight: _option.fontWeight,
                     strokeWidth: _option.strokeWidth,
