@@ -20,12 +20,14 @@ abstract final class DmUtils {
     required DanmakuContentItem content,
     required double fontSize,
     required int fontWeight,
+    String? fontFamily,
   }) {
     final builder = ui.ParagraphBuilder(ui.ParagraphStyle(
       textAlign: TextAlign.left,
       fontWeight: FontWeight.values[fontWeight],
       textDirection: TextDirection.ltr,
       maxLines: 1,
+      fontFamily: fontFamily,
     ));
 
     if (content.count case final count?) {
@@ -52,6 +54,7 @@ abstract final class DmUtils {
     required double fontSize,
     required int fontWeight,
     required double strokeWidth,
+    String? fontFamily,
   }) {
     double w = contentParagraph.maxIntrinsicWidth + strokeWidth;
     double h = contentParagraph.height + strokeWidth;
@@ -73,6 +76,7 @@ abstract final class DmUtils {
         fontWeight: FontWeight.values[fontWeight],
         textDirection: TextDirection.ltr,
         maxLines: 1,
+        fontFamily: fontFamily,
       ));
       final Paint strokePaint = Paint()
         ..shader = content.isColorful
@@ -128,12 +132,14 @@ abstract final class DmUtils {
     required SpecialDanmakuContentItem content,
     required int fontWeight,
     required double strokeWidth,
+    String? fontFamily,
   }) {
     final builder = ui.ParagraphBuilder(ui.ParagraphStyle(
       textAlign: TextAlign.left,
       fontWeight: FontWeight.values[fontWeight],
       textDirection: TextDirection.ltr,
       fontSize: content.fontSize,
+      fontFamily: fontFamily,
     ))
       ..pushStyle(ui.TextStyle(
         color: content.color,

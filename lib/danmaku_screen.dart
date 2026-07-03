@@ -164,6 +164,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
       content: content,
       fontSize: _option.fontSize,
       fontWeight: _option.fontWeight,
+      fontFamily: _option.fontFamily,
     );
 
     final danmakuWidth = (content.selfSend
@@ -190,6 +191,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
           fontSize: _option.fontSize,
           fontWeight: _option.fontWeight,
           strokeWidth: _option.strokeWidth,
+          fontFamily: _option.fontFamily,
         ));
 
     for (var i = 0; i < _trackCount; i++) {
@@ -262,6 +264,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
                 content: content as SpecialDanmakuContentItem,
                 fontWeight: _option.fontWeight,
                 strokeWidth: _option.strokeWidth,
+                fontFamily: _option.fontFamily,
               )),
         );
         if (_running && !_ticker.isActive) {
