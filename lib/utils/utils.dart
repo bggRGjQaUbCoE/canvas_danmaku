@@ -1,7 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:canvas_danmaku/models/danmaku_content_item.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 abstract final class DmUtils {
   static const maxRasterizeSize = 8192.0;

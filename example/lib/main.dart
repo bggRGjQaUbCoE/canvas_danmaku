@@ -4,17 +4,12 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:canvas_danmaku/canvas_danmaku.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:xml/xml.dart';
 
 void main() async {
-  runApp(
-    const MaterialApp(
-      title: 'CanvasDanmaku Demo',
-      home: HomePage(),
-    ),
-  );
+  runApp(const MaterialApp(title: 'CanvasDanmaku Demo', home: HomePage()));
 }
 
 class HomePage extends StatefulWidget {
@@ -77,9 +72,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('CanvasDanmaku Demo'),
-      ),
+      appBar: AppBar(title: const Text('CanvasDanmaku Demo')),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -633,11 +626,7 @@ class _HomePageState extends State<HomePage> {
         final type = _parseType(parts[1]);
         final color = _parseColor(parts[3]);
         _controller?.addDanmaku(
-          DanmakuContentItem(
-            content,
-            type: type,
-            color: color,
-          ),
+          DanmakuContentItem(content, type: type, color: color),
         );
       }
       index++;
