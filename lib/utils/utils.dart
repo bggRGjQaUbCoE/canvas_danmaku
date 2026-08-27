@@ -14,6 +14,8 @@ abstract final class DmUtils {
     _selfSendPaint.strokeWidth = strokeWidth;
   }
 
+  static String? fontFamily;
+
   static ui.Paragraph generateParagraph({
     required DanmakuContentItem content,
     required double fontSize,
@@ -23,6 +25,7 @@ abstract final class DmUtils {
       textAlign: TextAlign.left,
       fontWeight: FontWeight.values[fontWeight],
       textDirection: TextDirection.ltr,
+      fontFamily: fontFamily,
       maxLines: 1,
     ));
 
@@ -68,6 +71,7 @@ abstract final class DmUtils {
         textAlign: TextAlign.left,
         fontWeight: FontWeight.values[fontWeight],
         textDirection: TextDirection.ltr,
+        fontFamily: fontFamily,
         maxLines: 1,
       ));
       final Paint strokePaint = Paint()
