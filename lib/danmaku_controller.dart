@@ -1,7 +1,8 @@
 import 'package:canvas_danmaku/models/danmaku_content_item.dart';
 import 'package:canvas_danmaku/models/danmaku_item.dart';
 import 'package:canvas_danmaku/models/danmaku_option.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/foundation.dart'
+    show ValueChanged, VoidCallback, ValueGetter;
 
 class DanmakuController {
   final bool Function(DanmakuContentItem) addDanmaku;

@@ -30,8 +30,8 @@ dependencies:
   canvas_danmaku:
     path: ../
   xml: ^6.6.1
-
   material_ui: any
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

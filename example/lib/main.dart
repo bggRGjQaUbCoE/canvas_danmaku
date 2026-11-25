@@ -4,8 +4,8 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:canvas_danmaku/canvas_danmaku.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:xml/xml.dart';
 
 void main() async {
@@ -227,29 +227,24 @@ class _HomePageState extends State<HomePage> {
               child: AnimatedOpacity(
                 opacity: _opacity,
                 duration: const Duration(milliseconds: 100),
-                child: LayoutBuilder(
-                  builder: (_, constrains) {
-                    return DanmakuScreen(
-                      createdController: (e) {
-                        _controller = e;
-                      },
-                      option: DanmakuOption(
-                        fontSize: _fontSize,
-                        fontWeight: _fontWeight,
-                        duration: _duration,
-                        staticDuration: _staticDuration,
-                        strokeWidth: _strokeWidth,
-                        massiveMode: _massiveMode,
-                        static2Scroll: _static2Scroll,
-                        hideScroll: _hideScroll,
-                        hideTop: _hideTop,
-                        hideBottom: _hideBottom,
-                        safeArea: _safeArea,
-                        lineHeight: _lineHeight,
-                      ),
-                      size: constrains.biggest,
-                    );
+                child: DanmakuScreen(
+                  createdController: (e) {
+                    _controller = e;
                   },
+                  option: DanmakuOption(
+                    fontSize: _fontSize,
+                    fontWeight: _fontWeight,
+                    duration: _duration,
+                    staticDuration: _staticDuration,
+                    strokeWidth: _strokeWidth,
+                    massiveMode: _massiveMode,
+                    static2Scroll: _static2Scroll,
+                    hideScroll: _hideScroll,
+                    hideTop: _hideTop,
+                    hideBottom: _hideBottom,
+                    safeArea: _safeArea,
+                    lineHeight: _lineHeight,
+                  ),
                 ),
               ),
             ),

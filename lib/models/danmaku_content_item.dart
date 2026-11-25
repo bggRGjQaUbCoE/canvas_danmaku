@@ -2,6 +2,8 @@ import 'package:flutter/painting.dart' show Color;
 
 enum DanmakuItemType { scroll, top, bottom }
 
+const _white = Color(0xFFFFFFFF);
+
 class DanmakuContentItem {
   /// 弹幕文本
   final String text;
@@ -23,7 +25,7 @@ class DanmakuContentItem {
 
   DanmakuContentItem(
     this.text, {
-    this.color = const Color(0xFFFFFFFF),
+    this.color = _white,
     this.type = DanmakuItemType.scroll,
     this.selfSend = false,
     this.isColorful = false,

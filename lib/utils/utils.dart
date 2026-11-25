@@ -1,14 +1,29 @@
 import 'dart:ui' as ui;
 
 import 'package:canvas_danmaku/models/danmaku_content_item.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/rendering.dart'
+    show
+        Paint,
+        PaintingStyle,
+        LinearGradient,
+        TextAlign,
+        FontWeight,
+        TextDirection,
+        Offset,
+        Color,
+        Rect;
+
+const _green = Color(0xFF4CAF50);
+const _black = Color(0xFF000000);
+const _pink = Color(0xFFF2509E);
+const _blue = Color(0xFF308BCD);
 
 abstract final class DmUtils {
   static const maxRasterizeSize = 8192.0;
 
   static final Paint _selfSendPaint = Paint()
     ..style = PaintingStyle.stroke
-    ..color = Colors.green;
+    ..color = _green;
 
   static void updateSelfSendPaint(double strokeWidth) {
     _selfSendPaint.strokeWidth = strokeWidth;
@@ -21,20 +36,24 @@ abstract final class DmUtils {
     required double fontSize,
     required int fontWeight,
   }) {
-    final builder = ui.ParagraphBuilder(ui.ParagraphStyle(
-      textAlign: TextAlign.left,
-      fontWeight: FontWeight.values[fontWeight],
-      textDirection: TextDirection.ltr,
-      fontFamily: fontFamily,
-      maxLines: 1,
-    ));
+    final builder = ui.ParagraphBuilder(
+      ui.ParagraphStyle(
+        textAlign: TextAlign.left,
+        fontWeight: FontWeight.values[fontWeight],
+        textDirection: TextDirection.ltr,
+        fontFamily: fontFamily,
+        maxLines: 1,
+      ),
+    );
 
     if (content.count case final count?) {
       builder
-        ..pushStyle(ui.TextStyle(
-          color: content.color,
-          fontSize: fontSize * 0.6,
-        ))
+        ..pushStyle(
+          ui.TextStyle(
+            color: content.color,
+            fontSize: fontSize * 0.6,
+          ),
+        )
         ..addText('($count)')
         ..pop();
     }
@@ -67,32 +86,36 @@ abstract final class DmUtils {
     final canvas = ui.Canvas(rec)..scale(devicePixelRatio);
 
     if (strokeWidth != 0) {
-      final builder = ui.ParagraphBuilder(ui.ParagraphStyle(
-        textAlign: TextAlign.left,
-        fontWeight: FontWeight.values[fontWeight],
-        textDirection: TextDirection.ltr,
-        fontFamily: fontFamily,
-        maxLines: 1,
-      ));
+      final builder = ui.ParagraphBuilder(
+        ui.ParagraphStyle(
+          textAlign: TextAlign.left,
+          fontWeight: FontWeight.values[fontWeight],
+          textDirection: TextDirection.ltr,
+          fontFamily: fontFamily,
+          maxLines: 1,
+        ),
+      );
       final Paint strokePaint = Paint()
         ..shader = content.isColorful
             ? const LinearGradient(
-                    colors: [Color(0xFFF2509E), Color(0xFF308BCD)])
-                .createShader(Rect.fromLTWH(0, 0, w, h))
+                colors: [_pink, _blue],
+              ).createShader(Rect.fromLTWH(0, 0, w, h))
             : null
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth;
 
       if (!content.isColorful) {
-        strokePaint.color = Colors.black;
+        strokePaint.color = _black;
       }
 
       if (content.count case final count?) {
         builder
-          ..pushStyle(ui.TextStyle(
-            fontSize: fontSize * 0.6,
-            foreground: strokePaint,
-          ))
+          ..pushStyle(
+            ui.TextStyle(
+              fontSize: fontSize * 0.6,
+              foreground: strokePaint,
+            ),
+          )
           ..addText('($count)')
           ..pop();
       }

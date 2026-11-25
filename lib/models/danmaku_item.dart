@@ -66,7 +66,8 @@ class DanmakuItem {
         strokeWidth: strokeWidth,
         devicePixelRatio: devicePixelRatio,
       );
-      width = paragraph.maxIntrinsicWidth +
+      width =
+          paragraph.maxIntrinsicWidth +
           strokeWidth +
           (content.selfSend ? 4.0 : 0.0);
       height = paragraph.height + strokeWidth;

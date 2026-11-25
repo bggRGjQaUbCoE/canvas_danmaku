@@ -1,5 +1,6 @@
 import 'package:canvas_danmaku/canvas_danmaku.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/rendering.dart'
+    show CustomPainter, Canvas, Paint, FilterQuality, Offset, Rect;
 
 abstract base class BaseDanmakuPainter extends CustomPainter {
   final int length;
@@ -11,8 +12,7 @@ abstract base class BaseDanmakuPainter extends CustomPainter {
   final int batchThreshold;
   final int tick;
 
-  static final Paint _paint = Paint()
-    ..filterQuality = FilterQuality.low;
+  static final Paint _paint = Paint()..filterQuality = FilterQuality.low;
 
   const BaseDanmakuPainter({
     required this.length,
@@ -36,8 +36,12 @@ abstract base class BaseDanmakuPainter extends CustomPainter {
     if (img.width == item.width.ceil()) {
       canvas.drawImage(img, Offset(dx, dy), _paint);
     } else {
-      final src =
-          Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble());
+      final src = Rect.fromLTWH(
+        0,
+        0,
+        img.width.toDouble(),
+        img.height.toDouble(),
+      );
       final dst = Rect.fromLTWH(dx, dy, item.width, item.height);
       canvas.drawImageRect(img, src, dst, _paint);
     }
