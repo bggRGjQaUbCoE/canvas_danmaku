@@ -1,9 +1,14 @@
 import 'dart:math' show pi;
+import 'dart:ui' show Color;
 
+import 'package:flutter/animation.dart'
+    show Tween, Curves, Curve, ConstantTween;
 import 'package:flutter/foundation.dart' show objectRuntimeType;
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/rendering.dart' show Matrix4, Rect;
 
 enum DanmakuItemType { scroll, top, bottom, special }
+
+const _white = Color(0xFFFFFFFF);
 
 class DanmakuContentItem<T> {
   /// 弹幕文本
@@ -28,7 +33,7 @@ class DanmakuContentItem<T> {
 
   DanmakuContentItem(
     this.text, {
-    this.color = Colors.white,
+    this.color = _white,
     this.type = DanmakuItemType.scroll,
     this.selfSend = false,
     this.isColorful = false,
@@ -161,15 +166,15 @@ class SpecialDanmakuContentItem<T> extends DanmakuContentItem<T> {
   ) {
     double toRadix(double? value, dynamic rawValue) =>
         (value! > 1 || (rawValue is String && !rawValue.contains('.')))
-            ? value /= videoSize
-            : value;
+        ? value /= videoSize
+        : value;
 
     double? convert(dynamic digit) => switch (digit) {
-          int() => digit.toDouble(),
-          double() => digit.isFinite ? digit : null,
-          String() => double.tryParse(digit),
-          _ => null
-        };
+      int() => digit.toDouble(),
+      double() => digit.isFinite ? digit : null,
+      String() => double.tryParse(digit),
+      _ => null,
+    };
 
     double? start = convert(rawStart);
     double? end = convert(rawEnd);
@@ -182,18 +187,18 @@ class SpecialDanmakuContentItem<T> extends DanmakuContentItem<T> {
   }
 
   static int _parseInt(dynamic digit) => switch (digit) {
-        int() => digit,
-        double() => digit.toInt(),
-        String() => int.tryParse(digit) ?? 0,
-        _ => 0
-      };
+    int() => digit,
+    double() => digit.toInt(),
+    String() => int.tryParse(digit) ?? 0,
+    _ => 0,
+  };
 
   static double _parseDouble(dynamic digit) => switch (digit) {
-        int() => digit.toDouble(),
-        double() => digit,
-        String() => double.tryParse(digit) ?? 0,
-        _ => 0
-      };
+    int() => digit.toDouble(),
+    double() => digit,
+    String() => double.tryParse(digit) ?? 0,
+    _ => 0,
+  };
 
   static Tween<T> _makeTween<T>(T start, T end) {
     return start == end

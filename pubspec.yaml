@@ -3,16 +3,18 @@ description: "A high performance danmaku lib for flutter."
 version: 0.2.6
 #author: Predidit <i@predidit.com>
 homepage: https://github.com/Predidit/canvas_danmaku
+publish_to: "none"
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=1.17.0"
+  sdk: ">=3.12.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_ui: any
-  material_ui: any
+  piliplus_share:
+    git:
+      url: https://github.com/bggRGjQaUbCoE/piliplus_share.git
+      ref: main
 
 dev_dependencies:
   flutter_test:

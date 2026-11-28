@@ -5,7 +5,8 @@ import 'package:canvas_danmaku/base_danmaku_painter.dart';
 import 'package:canvas_danmaku/models/danmaku_content_item.dart';
 import 'package:canvas_danmaku/models/danmaku_item.dart';
 import 'package:canvas_danmaku/utils/utils.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/animation.dart' show Tween, ConstantTween;
+import 'package:flutter/rendering.dart' show Canvas, Size, Paint, Offset, Rect;
 
 final class SpecialDanmakuPainter extends BaseDanmakuPainter {
   List<DanmakuItem> danmakuItems;
@@ -34,21 +35,29 @@ final class SpecialDanmakuPainter extends BaseDanmakuPainter {
   }
 
   @pragma("vm:prefer-inline")
-  void _paintSpecialDanmaku(Canvas canvas, DanmakuItem dm,
-      SpecialDanmakuContentItem item, Size size, int elapsed) {
+  void _paintSpecialDanmaku(
+    Canvas canvas,
+    DanmakuItem dm,
+    SpecialDanmakuContentItem item,
+    Size size,
+    int elapsed,
+  ) {
     // 透明度动画
     final color = item.alphaTween == null
         ? item.color
         : item.color.withValues(
-            alpha: item.alphaTween!.transform(
-            elapsed / item.duration,
-          ));
+            alpha: item.alphaTween!.transform(elapsed / item.duration),
+          );
 
     // 位移动画
     double dx, dy;
     if (elapsed > item.translationStartDelay) {
-      late final translateProgress = item.easingType.transform(min(1.0,
-          (elapsed - item.translationStartDelay) / item.translationDuration));
+      late final translateProgress = item.easingType.transform(
+        min(
+          1.0,
+          (elapsed - item.translationStartDelay) / item.translationDuration,
+        ),
+      );
 
       double getOffset(Tween<double> tween) => tween is ConstantTween
           ? tween.begin!
@@ -90,8 +99,12 @@ final class SpecialDanmakuPainter extends BaseDanmakuPainter {
     if (image.width == imgW.ceil()) {
       canvas.drawImage(image, Offset(dx, dy), paint);
     } else {
-      final src =
-          Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble());
+      final src = Rect.fromLTWH(
+        0,
+        0,
+        image.width.toDouble(),
+        image.height.toDouble(),
+      );
       final dst = Rect.fromLTWH(dx, dy, imgW, imgH);
       canvas.drawImageRect(image, src, dst, paint);
     }

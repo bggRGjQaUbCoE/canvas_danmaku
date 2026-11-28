@@ -51,11 +51,11 @@ class DanmakuOption {
   final double lineHeight;
 
   bool hideWhat(DanmakuItemType type) => switch (type) {
-        DanmakuItemType.scroll => hideScroll,
-        DanmakuItemType.top => hideTop,
-        DanmakuItemType.bottom => hideBottom,
-        DanmakuItemType.special => hideSpecial,
-      };
+    DanmakuItemType.scroll => hideScroll,
+    DanmakuItemType.top => hideTop,
+    DanmakuItemType.bottom => hideBottom,
+    DanmakuItemType.special => hideSpecial,
+  };
 
   const DanmakuOption({
     this.fontSize = 16,
@@ -73,8 +73,8 @@ class DanmakuOption {
     this.static2Scroll = false,
     this.safeArea = true,
     this.lineHeight = 1.6,
-  })  : durationInMilliseconds = duration * 1000,
-        staticDurationInMilliseconds = staticDuration * 1000;
+  }) : durationInMilliseconds = duration * 1000,
+       staticDurationInMilliseconds = staticDuration * 1000;
 
   DanmakuOption copyWith({
     double? fontSize,

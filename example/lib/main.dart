@@ -5,8 +5,8 @@ import 'dart:math';
 
 import 'package:canvas_danmaku/canvas_danmaku.dart';
 import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:xml/xml.dart';
 
 void main() async {
@@ -69,8 +69,6 @@ class _HomePageState extends State<HomePage> {
 
   /// 静态弹幕无法添加时作为滚动弹幕添加
   bool _static2Scroll = false;
-
-  double _viewWidth = 0;
 
   DanmakuItem? _suspendedDM;
   OverlayEntry? _overlayEntry;
@@ -394,136 +392,140 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               children: [
                 Expanded(
-                  child: Listener(
-                    onPointerUp: (event) {
-                      // return;
-                      if (_controller == null) return;
+                  child: Builder(
+                    builder: (context) {
+                      return Listener(
+                        onPointerUp: (event) {
+                          // return;
+                          if (_controller == null) return;
 
-                      final items = _controller!
-                          .findDanmaku(event.localPosition)
-                          .toList();
-                      if (items.isNotEmpty) {
-                        for (var (_, i) in items) {
-                          i.suspend = true;
-                        }
-                        debugPrint(items.toString());
-                        Future.delayed(const Duration(seconds: 3), () {
-                          for (var (_, i) in items) {
-                            i.suspend = false;
+                          final items = _controller!
+                              .findDanmaku(event.localPosition)
+                              .toList();
+                          if (items.isNotEmpty) {
+                            for (var (_, i) in items) {
+                              i.suspend = true;
+                            }
+                            debugPrint(items.toString());
+                            Future.delayed(const Duration(seconds: 3), () {
+                              for (var (_, i) in items) {
+                                i.suspend = false;
+                              }
+                            });
                           }
-                        });
-                      }
 
-                      /// single
-                      final res = _controller!.findSingleDanmaku(
-                        event.localPosition,
-                      );
+                          /// single
+                          final res = _controller!.findSingleDanmaku(
+                            event.localPosition,
+                          );
 
-                      if (res == null) {
-                        _removeOverlay();
-                      } else if (res.$2 != _suspendedDM) {
-                        final (yPos, item) = res;
-                        _removeOverlay();
-                        item.suspend = true;
-                        _suspendedDM = item;
-                        print('danmaku id: ${item.content.extra}');
+                          if (res == null) {
+                            _removeOverlay();
+                          } else if (res.$2 != _suspendedDM) {
+                            final (yPos, item) = res;
+                            _removeOverlay();
+                            item.suspend = true;
+                            _suspendedDM = item;
+                            print('danmaku id: ${item.content.extra}');
 
-                        final dy = yPos;
-                        final dySpacing =
-                            event.position.dy - event.localPosition.dy;
-                        final dxSpacing =
-                            event.position.dx - event.localPosition.dx;
-                        _overlayEntry = OverlayEntry(
-                          builder: (context) {
-                            return Positioned(
-                              top: dy + item.height + dySpacing,
-                              left: clampDouble(
-                                event.position.dx - overlayWidth / 2,
-                                overlaySpacing + dxSpacing,
-                                _viewWidth -
-                                    overlayWidth -
-                                    overlaySpacing +
-                                    dxSpacing,
-                              ),
-                              child: Column(
-                                children: [
-                                  CustomPaint(
-                                    painter: TrianglePainter(Colors.black54),
-                                    size: const Size(12, 6),
+                            final dy = yPos;
+                            final dySpacing =
+                                event.position.dy - event.localPosition.dy;
+                            final dxSpacing =
+                                event.position.dx - event.localPosition.dx;
+                            _overlayEntry = OverlayEntry(
+                              builder: (_) {
+                                return Positioned(
+                                  top: dy + item.height + dySpacing,
+                                  left: clampDouble(
+                                    event.position.dx - overlayWidth / 2,
+                                    overlaySpacing + dxSpacing,
+                                    (context.findRenderObject() as RenderBox)
+                                            .size
+                                            .width -
+                                        overlayWidth -
+                                        overlaySpacing +
+                                        dxSpacing,
                                   ),
-                                  Container(
-                                    width: overlayWidth,
-                                    height: overlayHeight,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.black54,
-                                      borderRadius: BorderRadiusGeometry.all(
-                                        Radius.circular(18),
+                                  child: Column(
+                                    children: [
+                                      CustomPaint(
+                                        painter: TrianglePainter(
+                                          Colors.black54,
+                                        ),
+                                        size: const Size(12, 6),
                                       ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        _overlayItem(
-                                          const Icon(
-                                            size: 20,
-                                            Icons.thumb_up_off_alt_outlined,
-                                            color: Colors.white,
-                                          ),
-                                          onTap: () {
-                                            _removeOverlay();
-                                            print('on thumb up');
-                                          },
-                                        ),
-                                        _overlayItem(
-                                          const Icon(
-                                            size: 20,
-                                            Icons.copy,
-                                            color: Colors.white,
-                                          ),
-                                          onTap: () {
-                                            Clipboard.setData(
-                                              ClipboardData(
-                                                text: item.content.text,
+                                      Container(
+                                        width: overlayWidth,
+                                        height: overlayHeight,
+                                        decoration: const BoxDecoration(
+                                          color: Colors.black54,
+                                          borderRadius:
+                                              BorderRadiusGeometry.all(
+                                                Radius.circular(18),
                                               ),
-                                            );
-                                            _removeOverlay();
-                                            print('on copy');
-                                          },
                                         ),
-                                        _overlayItem(
-                                          const Icon(
-                                            size: 20,
-                                            Icons.report_problem_outlined,
-                                            color: Colors.white,
-                                          ),
-                                          onTap: () {
-                                            _removeOverlay();
-                                            print('on report');
-                                          },
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          children: [
+                                            _overlayItem(
+                                              const Icon(
+                                                size: 20,
+                                                Icons.thumb_up_off_alt_outlined,
+                                                color: Colors.white,
+                                              ),
+                                              onTap: () {
+                                                _removeOverlay();
+                                                print('on thumb up');
+                                              },
+                                            ),
+                                            _overlayItem(
+                                              const Icon(
+                                                size: 20,
+                                                Icons.copy,
+                                                color: Colors.white,
+                                              ),
+                                              onTap: () {
+                                                Clipboard.setData(
+                                                  ClipboardData(
+                                                    text: item.content.text,
+                                                  ),
+                                                );
+                                                _removeOverlay();
+                                                print('on copy');
+                                              },
+                                            ),
+                                            _overlayItem(
+                                              const Icon(
+                                                size: 20,
+                                                Icons.report_problem_outlined,
+                                                color: Colors.white,
+                                              ),
+                                              onTap: () {
+                                                _removeOverlay();
+                                                print('on report');
+                                              },
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                );
+                              },
                             );
-                          },
-                        );
-                        Overlay.of(context).insert(_overlayEntry!);
-                      }
-                    },
-                    child: ColoredBox(
-                      color: Colors.grey,
-                      child: AnimatedOpacity(
-                        opacity: _opacity,
-                        duration: const Duration(milliseconds: 100),
-                        child: LayoutBuilder(
-                          builder: (_, constrains) {
-                            _viewWidth = constrains.maxWidth;
-                            return ClipRect(
+                            Overlay.of(context).insert(_overlayEntry!);
+                          }
+                        },
+                        child: ColoredBox(
+                          color: Colors.grey,
+                          child: AnimatedOpacity(
+                            opacity: _opacity,
+                            duration: const Duration(milliseconds: 100),
+                            child: ClipRect(
                               child: DanmakuScreen<int>(
                                 createdController: (e) {
                                   _controller = e;
@@ -542,13 +544,12 @@ class _HomePageState extends State<HomePage> {
                                   safeArea: _safeArea,
                                   lineHeight: _lineHeight,
                                 ),
-                                size: constrains.biggest,
                               ),
-                            );
-                          },
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
                 SafeArea(
